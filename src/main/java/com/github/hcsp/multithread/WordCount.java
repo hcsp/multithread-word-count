@@ -42,7 +42,7 @@ public class WordCount {
     class WorkerJob implements Callable<Map<String, Integer>> {
         BufferedReader reader;
 
-        public WorkerJob(BufferedReader reader) {
+        WorkerJob(BufferedReader reader) {
             this.reader = reader;
         }
 
