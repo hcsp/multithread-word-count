@@ -1,52 +1,61 @@
 package com.github.hcsp.multithread;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class WordCount {
+    private final int threadNum;
+    private ExecutorService threadPool;
+
     public WordCount(int threadNum) {
+        threadPool = Executors.newFixedThreadPool(threadNum);
+        this.threadNum = threadNum;
     }
 
     // 统计文件中各单词的数量
-    public Map<String, Integer> count(File file) throws IOException {
-        Map<String, Integer> numberOfWord = new HashMap<>();
-        StringTokenizer stringTokenizer = dealWithStringFromFile(file);
-        while (stringTokenizer.hasMoreTokens()) {
-            String aWord = stringTokenizer.nextToken();
-            if (numberOfWord.containsKey(aWord)) {
-                int count = numberOfWord.get(aWord);
-                numberOfWord.put(aWord, count + 1);
-            } else {
-                numberOfWord.put(aWord, 1);
-            }
+    public Map<String, Integer> count(File file) throws IOException, ExecutionException, InterruptedException {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        List<Future<Map<String, Integer>>> list = new ArrayList<>();
+        Map<String, Integer> finalResult = new HashMap<>();
+        for (int i = 0; i < threadNum; i++) {
+            list.add(threadPool.submit(() -> {
+                Map<String, Integer> result = new HashMap<>();
+                while (!bufferedReader.readLine().isEmpty()) {
+                    String line = bufferedReader.readLine();
+                    String[] oneThreadReadOneLine = line.split("");
+                    for (String element : oneThreadReadOneLine
+                    ) {
+                        result.put(element, result.getOrDefault(element, 1));
+                    }
+                }
+                return result;
+            }));
         }
-
-        System.out.println(numberOfWord);
-        return numberOfWord;
+        for (Future<Map<String, Integer>> future : list
+        ) {
+            Map<String, Integer> resultFromThread = future.get();
+            mergeResultFromThread(resultFromThread, finalResult);
+        }
+        return finalResult;
     }
 
-    /**
-     * Processing the content of the file into a string
-     *
-     * @param file A file whose content is a character
-     * @return StringTokenizer
-     * @throws IOException File is empty
-     */
-
-    public static StringTokenizer dealWithStringFromFile(File file) throws IOException {
-        List<String> stringFromFile = Files.readAllLines(file.toPath());
-        StringTokenizer string;
-        string = new StringTokenizer(stringFromFile.toString()
-                .replace("[", " ")
-                .replace("]", " ")
-                .replace(",", " "));
-        return string;
-
+    private void mergeResultFromThread(Map<String, Integer> resultFromThread,
+                                       Map<String, Integer> finalResult) {
+        for (Map.Entry<String, Integer> entry : resultFromThread.entrySet()) {
+            int resultNumber = finalResult.getOrDefault(entry.getKey(), 0) + entry.getValue();
+            finalResult.put(entry.getKey(), resultNumber);
+        }
     }
+
 }
 
