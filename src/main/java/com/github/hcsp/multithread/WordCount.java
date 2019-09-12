@@ -33,9 +33,9 @@ public class WordCount {
     /**
      * Processing the content of the file into a string
      *
-     * @param file
+     * @param file A file whose content is a character
      * @return StringTokenizer
-     * @throws IOException
+     * @throws IOException File is empty
      */
 
     public static StringTokenizer dealWithStringFromFile(File file) throws IOException {
