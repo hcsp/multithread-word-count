@@ -27,20 +27,21 @@ public class WordCount {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
         List<Future<Map<String, Integer>>> list = new ArrayList<>();
         Map<String, Integer> finalResult = new HashMap<>();
-        for (int i = 0; i < threadNum; i++) {
+        for (int i = 0; i < threadNum; ++i) {
             list.add(threadPool.submit(() -> {
                 Map<String, Integer> result = new HashMap<>();
-                while (!bufferedReader.readLine().isEmpty()) {
-                    String line = bufferedReader.readLine();
-                    String[] oneThreadReadOneLine = line.split("");
+                String line;
+                while ((line = bufferedReader.readLine())!=null) {
+                    String[] oneThreadReadOneLine = line.split(" ");
                     for (String element : oneThreadReadOneLine
                     ) {
-                        result.put(element, result.getOrDefault(element, 1));
+                        result.put(element, result.getOrDefault(element, 0)+1);
                     }
                 }
                 return result;
             }));
         }
+
         for (Future<Map<String, Integer>> future : list
         ) {
             Map<String, Integer> resultFromThread = future.get();
@@ -56,6 +57,5 @@ public class WordCount {
             finalResult.put(entry.getKey(), resultNumber);
         }
     }
-
 }
 
