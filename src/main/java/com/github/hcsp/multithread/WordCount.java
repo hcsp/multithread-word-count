@@ -1,5 +1,7 @@
 package com.github.hcsp.multithread;
 
+import com.google.common.collect.Lists;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
@@ -29,9 +31,10 @@ public class WordCount {
         synchronized (lock) {
             List<Future<Map<String, Integer>>> list = new ArrayList<>();
             Map<String, Integer> finalResult = new ConcurrentHashMap<>();
-            for (int i = 0; i < threadNum; ++i) {
+            List<List<File>> partOfFiles = Lists.partition(files, threadNum);
+            for (List<File> partOfFile : partOfFiles) {
                 list.add(threadPool.submit(
-                        new Worker(averageList(files, threadNum).get(i))));
+                        new Worker(partOfFile)));
             }
 
             for (Future<Map<String, Integer>> future : list
@@ -48,21 +51,19 @@ public class WordCount {
     static class Worker implements Callable<Map<String, Integer>> {
         List<File> files;
 
-        public Worker(List<File> files) {
+        Worker(List<File> files) {
             this.files = files;
         }
 
         @Override
         public Map<String, Integer> call() throws Exception {
             Map<String, Integer> result = new ConcurrentHashMap<>();
-            while (!files.isEmpty()) {
-                for (File file : files) {
-                    List<String> oneFileToString = Files.readAllLines(file.toPath());
-                    for (String content : oneFileToString) {
-                        String[] contentToArray = content.split(" ");
-                        for (String element : contentToArray) {
-                            result.put(element, result.getOrDefault(element, 0) + 1);
-                        }
+            for (File file : files) {
+                List<String> oneFileToString = Files.readAllLines(file.toPath());
+                for (String content : oneFileToString) {
+                    String[] contentToArray = content.split(" ");
+                    for (String element : contentToArray) {
+                        result.put(element, result.getOrDefault(element, 0) + 1);
                     }
                 }
             }
@@ -78,23 +79,6 @@ public class WordCount {
         }
     }
 
-    private synchronized static List<List<File>> averageList(List<File> files, Integer number) {
-        List<List<File>> aPartOfList = new ArrayList<>();
-        int remainder = files.size() % number;
-        int division = files.size() / number;
-        int offset = 0;
-        for (int i = 0; i < number; i++) {
-            List<File> list;
-            if (remainder > 0) {
-                list = files.subList(i * division + offset, (i + 1) * division + offset + 1);
-                remainder--;
-            } else {
-                list = files.subList(i * division, (i + 1) * division);
-            }
-            aPartOfList.add(list);
-        }
-        return aPartOfList;
-    }
 
     public static void main(String[] args) throws ExecutionException, InterruptedException, FileNotFoundException {
         List<File> files = new ArrayList<>();
