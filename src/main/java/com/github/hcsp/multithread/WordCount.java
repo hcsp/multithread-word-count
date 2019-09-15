@@ -3,7 +3,6 @@ package com.github.hcsp.multithread;
 import com.google.common.collect.Lists;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
