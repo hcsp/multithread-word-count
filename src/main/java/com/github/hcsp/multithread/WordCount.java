@@ -78,15 +78,4 @@ public class WordCount {
             finalResult.put(entry.getKey(), resultNumber);
         }
     }
-
-
-    public static void main(String[] args) throws ExecutionException, InterruptedException, FileNotFoundException {
-        List<File> files = new ArrayList<>();
-        File file = new File("C:\\Users\\catsme\\IdeaProjects\\multithread-word-count2\\1.txt");
-        File file1 = new File("C:\\Users\\catsme\\IdeaProjects\\multithread-word-count2\\2.txt");
-        files.add(file);
-        files.add(file1);
-        WordCount wordCount = new WordCount(2);
-        wordCount.count(files);
-    }
 }
