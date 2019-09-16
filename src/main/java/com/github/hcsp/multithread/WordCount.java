@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,11 +13,12 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.IntStream;
+import java.util.concurrent.Future;
+
 
 public class WordCount {
     private final int threadNum;
-    private ExecutorService threadPool;
+    private final ExecutorService threadPool;
 
     public WordCount(int threadNum) {
         threadPool = Executors.newFixedThreadPool(threadNum);
@@ -25,33 +27,39 @@ public class WordCount {
 
 
     // 统计文件中各单词的数量
-    Map<String, Integer> count(List<File> files) {
+    Map<String, Integer> count(List<File> files) throws RuntimeException, ExecutionException, InterruptedException {
         Map<String, Integer> finalResult = new HashMap<>();
+        List<Future<Map<String, Integer>>> futures = new ArrayList<>();
 
+        for (File file : files) {
+            BufferedReader reader = createBufferedReader(file);
 
-        files.forEach(file -> {
-            BufferedReader reader;
-            try {
-                reader = new BufferedReader(new FileReader(file));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException();
+            // 将reader丢进一个worker处理，同时启用多个线程跑多个worker
+            for (int i = 0; i < threadNum; i++) {
+                futures.add(threadPool.submit(new WorkerJob(reader)));
             }
 
-            IntStream.rangeClosed(1, threadNum)
-                    .mapToObj(x -> threadPool.submit(new WorkerJob(reader)))
-                    .forEach(future -> {
-                        try {
-                            mergeWorkerResultIntoFinalResult(future.get(), finalResult);
-                        } catch (InterruptedException | ExecutionException e) {
-                            throw new RuntimeException();
-                        }
-                    });
-        });
+        }
 
-
+        for (Future<Map<String, Integer>> future : futures) {
+            Map<String, Integer> resultFromWorker = future.get();
+            mergeWorkerResultIntoFinalResult(resultFromWorker, finalResult);
+        }
 
         return finalResult;
     }
+
+
+    private BufferedReader createBufferedReader(File file) {
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException();
+        }
+        return reader;
+    }
+
 
     static class WorkerJob implements Callable<Map<String, Integer>> {
         private BufferedReader reader;
