@@ -48,7 +48,7 @@ public class WordCount {
     static class FileReadJob implements Callable<Map<String, Integer>> {
         private BufferedReader bufferedReader;
 
-        public FileReadJob(BufferedReader bufferedReader) {
+        FileReadJob(BufferedReader bufferedReader) {
             this.bufferedReader = bufferedReader;
         }
 
