@@ -1,12 +1,14 @@
 package com.github.hcsp.multithread;
 
+import com.sun.corba.se.impl.orbutil.ObjectUtility;
+
 import java.io.*;
-import java.nio.ReadOnlyBufferException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class WordCount {
     private int  threadNum;
@@ -24,11 +26,12 @@ public class WordCount {
 
         for (File file:files){
             BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line = "";
+            AtomicReference<String> line = new AtomicReference<>("");
             for (int i = 0; i < threadNum; i++) {
                 futrues.add(threadPool.submit(() -> {
-                    while((line = reader.readLine())!=null) {
-                        String[] words = line.split(" ");
+                    line.set(reader.readLine());
+                    while(line!=null) {
+                        String[] words = line.get().split(" ");
                         for (String word : words) {
                             result.put(word, result.getOrDefault(word, 0) + 1);
                         }
