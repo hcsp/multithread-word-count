@@ -1,7 +1,5 @@
 package com.github.hcsp.multithread;
 
-import com.sun.corba.se.impl.orbutil.ObjectUtility;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +27,7 @@ public class WordCount {
             AtomicReference<String> line = new AtomicReference<>("");
             for (int i = 0; i < threadNum; i++) {
                 futrues.add(threadPool.submit(() -> {
+                    System.out.println(""+ Thread.currentThread().getName()+": "+line.get());
                     line.set(reader.readLine());
                     while(line!=null) {
                         String[] words = line.get().split(" ");
