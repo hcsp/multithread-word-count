@@ -1,11 +1,20 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.Callable;
+
 
 public class WordCount {
     private int  threadNum;
@@ -48,7 +57,7 @@ public class WordCount {
         @Override
         public Map<String, Integer> call() throws Exception {
             String line;
-            while((line=reader.readLine())!=null){
+            while ((line=reader.readLine())!=null) {
                 String[] words = line.split(" ");
 
                 for (String word : words){
