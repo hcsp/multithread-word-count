@@ -3,6 +3,7 @@ package com.github.hcsp.multithread;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,16 +21,21 @@ public class WordCount {
     // 统计文件中各单词的数量
     Map<String, Integer> count(List<File> files) {
         Map<String, Integer> map = new HashMap<>();
+        List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         for (File file: files) {
             Future<Map<String, Integer>> future = executor.submit(new SingleTask(file));
+            futures.add(future);
+        }
+
+        for (Future<Map<String, Integer>> future: futures) {
             try {
-                for (Map.Entry<String, Integer> entry: future.get().entrySet()) {
+                for (Map.Entry<String, Integer> entry : future.get().entrySet()) {
                     String key = entry.getKey();
                     Integer val = entry.getValue();
 
                     if (map.containsKey(key)) {
                         map.put(key, map.get(key) + val);
-                    }else {
+                    } else {
                         map.put(key, val);
                     }
                 }
