@@ -6,46 +6,57 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class WordCount {
     private int  threadNum;
     private ExecutorService threadPool;
 
     public WordCount(int threadNum) {
-        ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
+        threadPool = Executors.newFixedThreadPool(threadNum);
         this.threadNum = threadNum;
     }
 
     // 统计文件中各单词的数量
     public Map<String, Integer> count(List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
-        Map<String, Integer> result = new HashMap<>();
-        List<Future<Map<String, Integer>>> futrues = new ArrayList<>();
-
-        for (File file:files){
+        Map<String, Integer> finalResult = new HashMap<>();
+        List<Future<Map<String, Integer>>> futures = new ArrayList<>();
+        for (File file:files) {
             BufferedReader reader = new BufferedReader(new FileReader(file));
-            AtomicReference<String> line = new AtomicReference<>("");
-            for (int i = 0; i < threadNum; i++) {
-                futrues.add(threadPool.submit(() -> {
-                    System.out.println(""+ Thread.currentThread().getName()+": "+line.get());
-                    line.set(reader.readLine());
-                    while(line!=null) {
-                        String[] words = line.get().split(" ");
-                        for (String word : words) {
-                            result.put(word, result.getOrDefault(word, 0) + 1);
-                        }
-                    }
-                    return result;
-                }));
+            for (int i=0; i<threadNum; i++) {
+                futures.add(threadPool.submit(new WorkerJob(reader)));
             }
         }
-        Map<String, Integer> finalResult = new HashMap<>();
 
-        for(Future<Map<String, Integer>> future : futrues) {
+        for (Future<Map<String, Integer>> future : futures) {
             Map<String, Integer> resultFromWorker = future.get();
             merWorkerResultIntoFinalResult(resultFromWorker, finalResult);
+
         }
         return finalResult;
+    }
+
+    static class WorkerJob implements Callable<Map<String, Integer>> {
+
+        private BufferedReader reader;
+
+        WorkerJob(BufferedReader reader) {
+            this.reader = reader;
+        }
+
+        Map<String, Integer> result = new HashMap<>();
+
+        @Override
+        public Map<String, Integer> call() throws Exception {
+            String line;
+            while((line=reader.readLine())!=null){
+                String[] words = line.split(" ");
+
+                for (String word : words){
+                    result.put(word, result.getOrDefault(word, 0) + 1);
+                }
+            }
+            return result;
+        }
     }
 
     private void merWorkerResultIntoFinalResult(Map<String, Integer> resultFromWorker,
