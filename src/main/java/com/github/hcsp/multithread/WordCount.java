@@ -16,61 +16,54 @@ import java.util.concurrent.Future;
 
 public class WordCount {
     private final int threadNum;
-    private ExecutorService threadPool;
+    private ExecutorService executorService;
 
     public WordCount(int threadNum) {
-        threadPool = Executors.newFixedThreadPool(threadNum);
+        executorService = Executors.newFixedThreadPool(threadNum);
         this.threadNum = threadNum;
 
     }
 
     // 统计文件中各单词的数量
-    public Map<String, Integer> count(File file) throws FileNotFoundException, ExecutionException, InterruptedException {
-        FileReader fileReader = new FileReader(file);
-        BufferedReader bufferedReader = new BufferedReader(fileReader);
+    public Map<String, Integer> count(List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
-        Map<String, Integer> finalResults = new HashMap<>();
+        Map<String, Integer> result = new HashMap<>();
+        for (File file : files) {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            futures.add(executorService.submit(new FileReadJob(bufferedReader)));
+        }
         for (Future<Map<String, Integer>> future : futures) {
-            Map<String, Integer> resultFromWorker = future.get();
-            mergeWorkResultIntoFinalResult(resultFromWorker, finalResults);
-
-
+            Map<String, Integer> fileWordsCount = future.get();
+            mergeFileWordsCountInfoResult(fileWordsCount, result);
         }
-        for (int i = 0; i < threadNum; i++) {
-            futures.add(threadPool.submit(new Callable<Map<String, Integer>>() {
-                @Override
-                public Map<String, Integer> call() throws Exception {
-                    String line;
-                    Map<String, Integer> result = new HashMap<>();
-                    while ((line = bufferedReader.readLine()) != null) {
-                        String[] words = line.split(" ");
-                        for (String word : words) {
-                            result.put(word, result.getOrDefault(word, 0) + 1);
-//                              if (result.containsKey(word)){
-//                                  result.put(word,result.get(word)+1);
-//
-//                              }
-//                              else {
-//                                  result.put(word,1);
-//                              }
-                        }
-
-                    }
-
-                    return result;
-                }
-            }));
-
-
-        }
-        return finalResults;
+        return result;
     }
 
-    private void mergeWorkResultIntoFinalResult(Map<String, Integer> resultFromWorker, Map<String, Integer> finalResults) {
-        for (Map.Entry<String, Integer> entry : resultFromWorker.entrySet()) {
-            String word = entry.getKey();
-            int mergedResult = finalResults.getOrDefault(word, 0) + entry.getValue();
-            finalResults.put(word, mergedResult);
+    private void mergeFileWordsCountInfoResult(Map<String, Integer> fileWordsCount, Map<String, Integer> result) {
+        for (Map.Entry<String, Integer> entry : fileWordsCount.entrySet()) {
+            int mergeValue = entry.getValue() + result.getOrDefault(entry.getKey(), 0);
+            result.put(entry.getKey(), mergeValue);
+        }
+    }
+
+    static class FileReadJob implements Callable<Map<String, Integer>> {
+        private BufferedReader bufferedReader;
+
+        FileReadJob(BufferedReader bufferedReader) {
+            this.bufferedReader = bufferedReader;
+        }
+
+        @Override
+        public Map<String, Integer> call() throws Exception {
+            Map<String, Integer> lineWordsCount = new HashMap<>();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] words = line.split(" ");
+                for (String word : words) {
+                    lineWordsCount.put(word, lineWordsCount.getOrDefault(word, 0) + 1);
+                }
+            }
+            return lineWordsCount;
         }
     }
 }
