@@ -1,82 +1,77 @@
 package com.github.hcsp.multithread;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.Callable;
 
 public class WordCount {
 
-    private final int nThreads;
+    private final int nThread;
 
-    private final CountDownLatch countDownLatch;
-
-    private final Map<String, Integer> result = Collections.synchronizedMap(new HashMap<>());
-
-    private final ExecutorService executorService;
+    private final ExecutorService executor;
 
     public WordCount(int threadNum) {
-        this.nThreads = threadNum;
-        countDownLatch = new CountDownLatch(nThreads);
-        executorService = Executors.newFixedThreadPool(nThreads);
+        nThread = threadNum;
+        executor = Executors.newFixedThreadPool(nThread);
     }
 
     // 统计文件中各单词的数量
-    public Map<String, Integer> count(List<File> file) {
-        int size = file.size();
-        int n = size / nThreads;
-        int rest = size % nThreads;
-        int j = 0;
-        int start = 0;
-        for (int i = 0; i < nThreads; i++) {
-            int currentTaskCount = (j++ < rest) ? 1 + n : n;
-            executorService.execute(new WordCountTask(file.subList(start, start + currentTaskCount)));
-            start += currentTaskCount;
+    public Map<String, Integer> count(List<File> files) throws InterruptedException, ExecutionException {
+        // validate
+        if (null == files || 0 == files.size()) {
+            return new HashMap<>();
         }
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        final Map<String, Integer> res = new HashMap<>();
+        final List<Future<Map<String, Integer>>> futures = new ArrayList<>();
+        for (File file : files) {
+            Future<Map<String, Integer>> future = executor.submit(new CountTask(file));
+            futures.add(future);
         }
-        return result;
+        mergeResult(futures, res);
+        return res;
     }
 
-    private class WordCountTask implements Runnable {
+    private void mergeResult(List<Future<Map<String, Integer>>> futures, Map<String, Integer> res) throws ExecutionException, InterruptedException {
+        for (Future<Map<String, Integer>> future : futures) {
+            Map<String, Integer> temp = future.get();
+            for (Map.Entry<String, Integer> entry : temp.entrySet()) {
+                res.put(entry.getKey(), res.getOrDefault(entry.getKey(), 0) + entry.getValue());
+            }
+        }
+    }
 
-        private List<File> tasks;
+    class CountTask implements Callable<Map<String, Integer>> {
 
-        WordCountTask(List<File> tasks) {
-            this.tasks = tasks;
+        private final File file;
+
+        CountTask(File file) {
+            this.file = file;
         }
 
         @Override
-        public void run() {
-            for (File file : tasks) {
-                try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-                    String line = null;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        doCount(line);
+        public Map<String, Integer> call() throws Exception {
+            final Map<String, Integer> map = new HashMap<>();
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
+                String line = null;
+                while ((line = bufferedReader.readLine()) != null) {
+                    String[] words = line.split(" ");
+                    for (String word : words) {
+                        map.put(word, map.getOrDefault(word, 0) + 1);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
-            countDownLatch.countDown();
+            return map;
         }
-
-        private void doCount(String line) {
-            String[] strings = line.split(" ");
-            for (String s : strings) {
-                result.put(s, result.getOrDefault(s, 0) + 1);
-            }
-        }
-
     }
+
 }
