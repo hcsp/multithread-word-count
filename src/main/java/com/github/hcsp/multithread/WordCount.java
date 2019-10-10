@@ -33,6 +33,7 @@ public class WordCount {
                 futures.add(threadPool.submit(new WorkerJob(reader)));
 
             }
+        }
 
             Map<String, Integer> finalResult = new HashMap<>();
             for (Future<Map<String, Integer>> future : futures) {
@@ -40,8 +41,6 @@ public class WordCount {
                 mergeWorkerResultIntoFinalResult(resultsFromWorker, finalResult);
             }
             return finalResult;
-        }
-        return null;
     }
 
     private void mergeWorkerResultIntoFinalResult(Map<String, Integer> resultsFromWorker,
