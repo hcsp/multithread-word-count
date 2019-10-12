@@ -16,7 +16,6 @@
         <property name="message" value="Line has trailing spaces."/>
     </module>
     <module name="TreeWalker">
-        <module name="AvoidStarImport"/>
         <module name="IllegalImport"/>
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
