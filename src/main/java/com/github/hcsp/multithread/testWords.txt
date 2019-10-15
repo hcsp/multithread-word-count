@@ -1,0 +1,11 @@
+apple banana tomato1
+tomato orange apple apple1
+banana tomato tomato1
+banana orange1
+banana1
+banana tomato tomato2
+apple banana tomato2
+tomato orange apple apple2
+banana tomato tomato2
+banana orange2
+banana2
