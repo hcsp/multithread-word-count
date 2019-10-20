@@ -36,11 +36,11 @@ public class WordCount {
         Map<String, Integer> map = new HashMap<>();
         list.forEach(x -> {
             try {
-                map.putAll(x.get());
-
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+                Map<String, Integer> getmap = x.get();
+                map.forEach((key, value) -> {
+                    map.merge(key, getmap.get(key), Integer::sum);
+                });
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         });
