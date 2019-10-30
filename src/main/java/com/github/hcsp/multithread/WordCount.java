@@ -16,16 +16,19 @@ public class WordCount {
 
 
     /**
+     * 每个线程计算一个文件
      *
      * @param fileList 文件列表
-     * @return
+     * @return wordCounts
+     * @throws ExecutionException   执行异常
+     * @throws InterruptedException 中断异常
      */
     public Map<String, Integer> count(List<File> fileList) throws ExecutionException, InterruptedException {
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
-        for (File file :fileList) {
+        for (File file : fileList) {
             futures.add(threadPool.submit(
                     () -> countOneFile(file)
-                    ));
+            ));
         }
 
         //merge results
@@ -33,7 +36,7 @@ public class WordCount {
         Map<String, Integer> temp;
         for (Future<Map<String, Integer>> f : futures) {
             temp = f.get();
-            for(Map.Entry<String, Integer> entry: temp.entrySet()) {
+            for (Map.Entry<String, Integer> entry : temp.entrySet()) {
                 wordCounts.put(entry.getKey(),
                         wordCounts.getOrDefault(entry.getKey(), 0) + entry.getValue());
             }
