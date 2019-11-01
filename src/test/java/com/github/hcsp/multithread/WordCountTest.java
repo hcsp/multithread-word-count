@@ -33,6 +33,7 @@ public class WordCountTest {
                         .collect(Collectors.toList());
         WordCount wordCount = new WordCount(10);
         Map<String, Integer> countResult = wordCount.count(files);
+        System.out.println("xxxxxxxx");
         System.out.println(countResult);
         Assertions.assertTrue(countResult.values().stream().allMatch(n -> n == REPEAT));
     }
