@@ -15,46 +15,45 @@ public class WordCount {
     private ExecutorService threadPool;
 
     public WordCount(int threadNum) {
-        threadPool = Executors.newFixedThreadPool(threadNum);
         this.threadNum = threadNum;
+        threadPool = Executors.newFixedThreadPool(threadNum);
     }
 
     // 统计文件中各单词的数量
-    public Map<String, Integer> count(File file) throws ExecutionException, InterruptedException, FileNotFoundException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-
-        List<Future<Map<String, Integer>>> futures = new ArrayList<>();
-        // 开若干个线程, 每个线程去读取文件的一行内容,并将其中的单词统计结果返回
-        // 最后, 主线程将工作线程返回的结果汇总在一起
-        for (int i = 0; i < threadNum; i++) {
-            futures.add(threadPool.submit(new WorkerJob(reader)));
-        }
-        List<Map<String, Integer>> resultsFromWorkers = new ArrayList<>();
+    public Map<String, Integer> count(List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
         Map<String, Integer> finalResult = new HashMap<>();
+        List<Future<Map<String, Integer>>> futures = new ArrayList<>();
+        for (File file : files) {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            for (int i = 0; i < threadNum; i++) {
+                futures.add(threadPool.submit(new WorkJob(reader)));
+            }
+        }
+
         for (Future<Map<String, Integer>> future : futures) {
-            Map<String, Integer> resultsFromWorker = future.get();
-            mergeWorkerResultIntoFinalResult(resultsFromWorker, finalResult);
+            Map<String, Integer> resultFromWorker = future.get();
+            mergeWorkerResultToFinalResult(resultFromWorker, finalResult);
         }
         return finalResult;
     }
 
-    private void mergeWorkerResultIntoFinalResult(Map<String, Integer> resultsFromWorker, Map<String, Integer> finalResult) {
-        for (Map.Entry<String, Integer> entry : resultsFromWorker.entrySet()) {
+    private void mergeWorkerResultToFinalResult(Map<String, Integer> resultFromWorker, Map<String, Integer> finalResult) {
+        for (Map.Entry<String, Integer> entry : resultFromWorker.entrySet()) {
             String word = entry.getKey();
             int mergedResult = finalResult.getOrDefault(word, 0) + entry.getValue();
             finalResult.put(word, mergedResult);
         }
     }
 
-    static class WorkerJob implements Callable<Map<String, Integer>> {
+    private class WorkJob implements Callable<Map<String, Integer>> {
         private BufferedReader reader;
 
-        WorkerJob(BufferedReader reader) {
+        WorkJob(BufferedReader reader) {
             this.reader = reader;
         }
 
         @Override
-        public Map<String, Integer> call() throws IOException {
+        public Map<String, Integer> call() throws Exception {
             String line;
             Map<String, Integer> result = new HashMap<>();
             while ((line = reader.readLine()) != null) {
