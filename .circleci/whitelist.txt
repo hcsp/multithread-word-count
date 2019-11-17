@@ -1,2 +1,2 @@
-src/main/java/com/github/hcsp/multithread/WordCount.java
+src/main/java/com/github/hcsp/multithread/
 pom.xml
