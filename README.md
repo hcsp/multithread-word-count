@@ -19,7 +19,7 @@ i have a dog
 - `Lock/Condition`
 - `CountDownLatch`
 - `Future`与线程池
-- `ForJoinPool`
+- `ForkJoinPool`
 - `parallelStream()`
 - 等等等等
 
