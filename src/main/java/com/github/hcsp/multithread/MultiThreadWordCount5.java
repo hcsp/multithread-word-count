@@ -2,7 +2,6 @@ package com.github.hcsp.multithread;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
