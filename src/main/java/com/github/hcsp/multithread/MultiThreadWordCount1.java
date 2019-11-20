@@ -17,16 +17,16 @@ public class MultiThreadWordCount1 {
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", Integer.toString(threadNum));
         Map<String, Long> result;
-        try (Stream<String> lines = files.parallelStream().flatMap(MultiThreadWordCount1::apply)) {
-            result = lines.flatMap(line -> Arrays.stream(line.split(" "))).collect(Collectors.toList()).
+        try (Stream<String> words = files.parallelStream().flatMap(MultiThreadWordCount1::apply)) {
+            result = words.collect(Collectors.toList()).
                     parallelStream().collect(Collectors.groupingBy(String::toString, counting()));
         }
         return Maps.transformValues(result, Long::intValue);
     }
 
-    private static Stream<String> apply(File file) {
+    static Stream<String> apply(File file) {
         try {
-            return Files.readLines(file, Charsets.UTF_8).stream().map(stringList -> stringList.split(" ")).
+            return Files.readLines(file, Charsets.UTF_8).stream().map(stringList -> stringList.split("\\s+")).
                     flatMap(Arrays::stream);
         } catch (IOException e) {
             e.printStackTrace();
