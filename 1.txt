@@ -1,4 +1,0 @@
-a b c a
-a b a z
-hello java
-flink
