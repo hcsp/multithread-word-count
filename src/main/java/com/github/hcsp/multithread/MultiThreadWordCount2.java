@@ -1,6 +1,7 @@
 package com.github.hcsp.multithread;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,7 +17,7 @@ public class MultiThreadWordCount2 {
         Map<String, Integer> result = new HashMap<>();
         ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         for (File file : files) {
-            Future<Map<String, Integer>> wordCounts = threadPool.submit(new WordCount(file));
+            Future<Map<String, Integer>> wordCounts = threadPool.submit(new Count(file));
             Map<String, Integer> single = wordCounts.get();
             for (Map.Entry<String, Integer> entry : single.entrySet()) {
                 result.put(entry.getKey(),result.getOrDefault(entry.getKey(),0)+entry.getValue() );
@@ -27,16 +28,20 @@ public class MultiThreadWordCount2 {
     }
 }
 
-class WordCount implements Callable<Map<String, Integer>> {
+class Count implements Callable<Map<String, Integer>> {
 
     File file;
 
-    public WordCount(File file) {
+    public Count(File file) {
         this.file = file;
     }
 
     @Override
     public Map<String, Integer> call() throws Exception {
+        return fileCount(file);
+    }
+
+    public static Map<String, Integer> fileCount(File file) throws IOException {
         Map<String, Integer> wordsResult = new HashMap<>();
         List<String> words =
                 Files.readAllLines(file.toPath()).stream().flatMap(line -> Arrays.stream(line.split("\\s+"))).
