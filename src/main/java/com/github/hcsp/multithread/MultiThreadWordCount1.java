@@ -18,8 +18,7 @@ public class MultiThreadWordCount1 {
         System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", Integer.toString(threadNum));
         Map<String, Long> result;
         try (Stream<String> words = files.parallelStream().flatMap(MultiThreadWordCount1::apply)) {
-            result = words.collect(Collectors.toList()).
-                    parallelStream().collect(Collectors.groupingBy(String::toString, counting()));
+            result = words.parallel().collect(Collectors.groupingBy(String::toString, counting()));
         }
         return Maps.transformValues(result, Long::intValue);
     }

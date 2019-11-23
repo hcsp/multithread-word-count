@@ -27,8 +27,7 @@ public class MultiThreadWordCount5 {
                 try {
                     lock.lock();
                     List<String> words =
-                            Files.readAllLines(file.toPath()).stream().flatMap(line -> Arrays.stream(line.split("\\s" +
-                                    "+"))).collect(Collectors.toList());
+                            Files.readAllLines(file.toPath()).stream().flatMap(line -> Arrays.stream(line.split("\\s+"))).collect(Collectors.toList());
                     for (String word : words) {
                         result.put(word, result.getOrDefault(word, 0) + 1);
                     }

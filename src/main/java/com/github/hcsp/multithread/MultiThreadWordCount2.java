@@ -38,10 +38,10 @@ class Count implements Callable<Map<String, Integer>> {
 
     @Override
     public Map<String, Integer> call() throws Exception {
-        return fileCount(file);
+        return wordsCount(file);
     }
 
-    public static Map<String, Integer> fileCount(File file) throws IOException {
+    public static Map<String, Integer> wordsCount(File file) throws IOException {
         Map<String, Integer> wordsResult = new HashMap<>();
         List<String> words =
                 Files.readAllLines(file.toPath()).stream().flatMap(line -> Arrays.stream(line.split("\\s+"))).
