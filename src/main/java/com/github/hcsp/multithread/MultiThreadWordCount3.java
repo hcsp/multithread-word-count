@@ -13,7 +13,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.counting;
 
 public class MultiThreadWordCount3 {
     // 使用threadNum个线程，并发统计文件中各单词的数量

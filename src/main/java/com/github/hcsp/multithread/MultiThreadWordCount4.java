@@ -9,7 +9,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 
-import static com.github.hcsp.multithread.Count.wordsCount;
+import static com.github.hcsp.multithread.CountFile.wordsCount;
 
 public class MultiThreadWordCount4 {
     //     使用threadNum个线程，并发统计文件中各单词的数量

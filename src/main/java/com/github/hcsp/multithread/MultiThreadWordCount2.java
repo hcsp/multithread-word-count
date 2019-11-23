@@ -11,16 +11,16 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class MultiThreadWordCount2 {
-    // 使用threadNum个线程，并发统计文件中各单词的数量
+    // 使用future线程池
     public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException,
             InterruptedException {
         Map<String, Integer> result = new HashMap<>();
         ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         for (File file : files) {
-            Future<Map<String, Integer>> wordCounts = threadPool.submit(new Count(file));
+            Future<Map<String, Integer>> wordCounts = threadPool.submit(new CountFile(file));
             Map<String, Integer> single = wordCounts.get();
             for (Map.Entry<String, Integer> entry : single.entrySet()) {
-                result.put(entry.getKey(),result.getOrDefault(entry.getKey(),0)+entry.getValue() );
+                result.put(entry.getKey(), result.getOrDefault(entry.getKey(), 0) + entry.getValue());
             }
         }
 
@@ -28,11 +28,11 @@ public class MultiThreadWordCount2 {
     }
 }
 
-class Count implements Callable<Map<String, Integer>> {
+class CountFile implements Callable<Map<String, Integer>> {
 
-    File file;
+    private File file;
 
-    public Count(File file) {
+    CountFile(File file) {
         this.file = file;
     }
 
@@ -41,11 +41,10 @@ class Count implements Callable<Map<String, Integer>> {
         return wordsCount(file);
     }
 
-    public static Map<String, Integer> wordsCount(File file) throws IOException {
+    static Map<String, Integer> wordsCount(File file) throws IOException {
         Map<String, Integer> wordsResult = new HashMap<>();
-        List<String> words =
-                Files.readAllLines(file.toPath()).stream().flatMap(line -> Arrays.stream(line.split("\\s+"))).
-                        collect(Collectors.toList());
+        List<String> words = Files.readAllLines(file.toPath()).stream().flatMap(line -> Arrays.stream(line.split("\\s" +
+                "+"))).collect(Collectors.toList());
         for (String word : words) {
             wordsResult.put(word, wordsResult.getOrDefault(word, 0) + 1);
         }
