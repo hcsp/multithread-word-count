@@ -3,24 +3,33 @@ package com.github.hcsp.multithread;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveTask;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 使用Fork/Join框架实现协同读文件
+ * 使用并发流实现线程间协作
  */
-public class MultiThreadWordCount5 {
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+public class MultiThreadWordCount6 {
+    public static void main(String[] args) {
         List<File> files = Arrays.asList(
                 new File("1.txt"),
                 new File("2.txt")
         );
 
-        ForkJoinPool pool = new ForkJoinPool();
-        // pool.submit(new WordCount(files)).get();
-        System.out.println(pool.submit(new WordCount(files)).get());
+//        Map<String, Integer> finalResult = new ConcurrentHashMap<>();
+//        files.stream().forEach(file -> {
+//            Map<String, Integer> wordCount = count(file);
+//            finalResult.putAll(merge(finalResult, wordCount));
+//        });
+
+        Map<String, Integer> finalResultMap = files.parallelStream()
+                .map(MultiThreadWordCount6::count)
+                .reduce(new HashMap<>(), MultiThreadWordCount6::merge);
+
+        System.out.println(finalResultMap);
     }
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
@@ -49,24 +58,5 @@ public class MultiThreadWordCount5 {
                     map1.getOrDefault(word, 0) + map2.getOrDefault(word, 0));
         }
         return map1;
-    }
-
-    static class WordCount extends RecursiveTask<Map<String, Integer>> {
-        List<File> files;
-
-        public WordCount(List<File> files) {
-            this.files = files;
-        }
-
-        @Override
-        protected Map<String, Integer> compute() {
-            if (files.isEmpty()) {
-                return Collections.emptyMap();
-            }
-            Map<String, Integer> wordCountMap = count(files.get(0));
-            Map<String, Integer> CountOfRestFilesMap = new WordCount(files.subList(1, files.size())).compute();
-            return merge(wordCountMap, CountOfRestFilesMap);
-
-        }
     }
 }

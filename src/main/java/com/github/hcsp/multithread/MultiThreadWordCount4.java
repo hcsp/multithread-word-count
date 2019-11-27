@@ -5,18 +5,23 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.*;
 
+/**
+ * 使用ExcutorService与Future实现线程协同
+ */
 public class MultiThreadWordCount4 {
     public static void main(String[] args) {
-        ConcurrentHashMap map = new ConcurrentHashMap();
         List<File> files = Arrays.asList(
                 new File("1.txt"),
                 new File("2.txt")
         );
-        count(files.size(), files);
+        // count(files.size(), files);
+        System.out.println(count(files.size(), files));
     }
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) {
+        Map<String, Integer> finalResultMap = new HashMap<>();
+
         ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         for (File file : files) {
@@ -24,7 +29,6 @@ public class MultiThreadWordCount4 {
             futures.add(future);
         }
 
-        Map<String, Integer> finalResultMap = new HashMap<>();
         for (Future<Map<String, Integer>> future : futures) {
             Map<String, Integer> wordCountMap = null;
             try {
