@@ -54,7 +54,7 @@ public class MultiThreadWordCount5 {
     static class WordCount extends RecursiveTask<Map<String, Integer>> {
         List<File> files;
 
-        public WordCount(List<File> files) {
+        WordCount(List<File> files) {
             this.files = files;
         }
 

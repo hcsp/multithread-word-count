@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 使用CountDownLatch实现多线程协作
@@ -23,6 +20,7 @@ public class MultiThreadWordCount3 {
         );
         // count(files.size(), files);
         System.out.println(count(files.size(), files));
+
     }
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
@@ -32,7 +30,9 @@ public class MultiThreadWordCount3 {
 
         for (File file : files) {
             new Thread(() -> {
-                merge(finalResultMap, wordCount(file));
+                synchronized (MultiThreadWordCount3.class) {
+                    merge(finalResultMap, wordCount(file));
+                }
                 latch.countDown();
             }).start();
         }

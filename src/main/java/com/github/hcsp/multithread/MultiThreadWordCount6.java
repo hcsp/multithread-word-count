@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 使用并发流实现线程间协作
@@ -19,15 +18,16 @@ public class MultiThreadWordCount6 {
                 new File("2.txt")
         );
 
-//        Map<String, Integer> finalResult = new ConcurrentHashMap<>();
-//        files.stream().forEach(file -> {
-//            Map<String, Integer> wordCount = count(file);
-//            finalResult.putAll(merge(finalResult, wordCount));
-//        });
+        Map<String, Integer> finalResultMap = new HashMap<>();
+        files.parallelStream()
+                .forEach(file -> {
+                    Map<String, Integer> wordCount = count(file);
+                    merge(finalResultMap, wordCount);
+                });
 
-        Map<String, Integer> finalResultMap = files.parallelStream()
-                .map(MultiThreadWordCount6::count)
-                .reduce(new HashMap<>(), MultiThreadWordCount6::merge);
+//        Map<String, Integer> finalResultMap = files.parallelStream()
+//                .map(MultiThreadWordCount6::count)
+//                .reduce(new HashMap<>(), MultiThreadWordCount6::merge);
 
         System.out.println(finalResultMap);
     }

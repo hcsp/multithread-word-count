@@ -53,7 +53,7 @@ public class MultiThreadWordCount4 {
     static class WordCount implements Callable<Map<String, Integer>> {
         File file;
 
-        public WordCount(File file) {
+        WordCount(File file) {
             this.file = file;
         }
 

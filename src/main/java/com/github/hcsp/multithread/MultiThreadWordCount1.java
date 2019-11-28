@@ -55,7 +55,7 @@ public class MultiThreadWordCount1 {
     static class Container {
         int threadNum;
 
-        public Container(int threadNum) {
+        Container(int threadNum) {
             this.threadNum = threadNum;
         }
     }
