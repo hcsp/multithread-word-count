@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
@@ -19,7 +17,7 @@ public class MultiThreadWordCount1 {
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
-        ConcurrentHashMap<String,Integer> reslutmap = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, Integer> reslutmap = new ConcurrentHashMap<>();
         ArrayList<Future<ConcurrentHashMap<String, Integer>>> futures = new ArrayList<>();
 
         for (File file : files) {
@@ -32,7 +30,7 @@ public class MultiThreadWordCount1 {
             for (String s : concurrentHashMap1.keySet()) {
                 Integer map1OrDefault = concurrentHashMap1.getOrDefault(s, 0);
                 Integer reslutmapOrDefault = reslutmap.getOrDefault(s, 0);
-                reslutmap.put(s, map1OrDefault+reslutmapOrDefault);
+                reslutmap.put(s, map1OrDefault + reslutmapOrDefault);
             }
         }
         return reslutmap;
@@ -41,13 +39,13 @@ public class MultiThreadWordCount1 {
     static class countfile implements Callable<ConcurrentHashMap<String, Integer>> {
         File file;
 
-        public countfile(File file) {
+         countfile(File file) {
             this.file = file;
         }
 
         @Override
         public ConcurrentHashMap<String, Integer> call() throws Exception {
-            ConcurrentHashMap<String,Integer> concurrentHashMap = new ConcurrentHashMap<>();
+            ConcurrentHashMap<String, Integer> concurrentHashMap = new ConcurrentHashMap<>();
             try {
                 List<String> lines = Files.readAllLines(file.toPath());
                 for (String line : lines) {

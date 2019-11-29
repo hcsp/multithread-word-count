@@ -7,22 +7,24 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 
 public class MultiThreadWordCount5 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
-        public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException, ExecutionException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException, ExecutionException {
 
-            if (files == null) {
-                return null;
-            }
-
-            ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
-            Map<String, Integer> map = forkJoinPool.submit(new fileswordcount(files)).get();
-            return map;
+        if (files == null) {
+            return null;
         }
 
-    private static Map<String, Integer>  fileWordCount(File file) {
+        ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
+        Map<String, Integer> map = forkJoinPool.submit(new fileswordcount(files)).get();
+        return map;
+    }
+
+    private static Map<String, Integer> fileWordCount(File file) {
         Map<String, Integer> map = new HashMap<>();
         try {
             List<String> lines = Files.readAllLines(file.toPath());
@@ -34,7 +36,7 @@ public class MultiThreadWordCount5 {
                 }
             }
 
-        } catch (IOException  e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return map;
@@ -52,7 +54,7 @@ public class MultiThreadWordCount5 {
     static class fileswordcount extends RecursiveTask<Map<String, Integer>> {
         List<File> files;
 
-        public fileswordcount(List<File> files) {
+         fileswordcount(List<File> files) {
             this.files = files;
         }
 
