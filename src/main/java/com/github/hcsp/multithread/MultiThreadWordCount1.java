@@ -28,6 +28,7 @@ public class MultiThreadWordCount1 {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new RuntimeException("出现文件I/O异常");
             }
 
         });
@@ -36,6 +37,7 @@ public class MultiThreadWordCount1 {
                 mergeWorkerCount(future.get(), countMap);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
+                throw new RuntimeException("多线程执行出现异常");
             }
         }
         return countMap;
