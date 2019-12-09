@@ -34,10 +34,11 @@ public class MultiThreadWordCount2 {
 
         for (File file : files) {
             new Thread(() -> {
+                Map<String, Integer> fileMap = wordCount(file);
                 lock.lock();
                 try {
                     container.threadNum--;
-                    merge(finalResultMap, wordCount(file));
+                    merge(finalResultMap, fileMap);
                     if (container.threadNum == 0) {
                         merge.signal();
                     }

@@ -28,9 +28,10 @@ public class MultiThreadWordCount1 {
 
         for (File file : files) {
             new Thread(() -> {
+                Map<String, Integer> fileMap = wordCount(file);
                 synchronized (container) {
                     container.threadNum--;
-                    merge(finalResultMap, wordCount(file));
+                    merge(finalResultMap, fileMap);
                     if (container.threadNum == 0) {
                         container.notify();
                     }

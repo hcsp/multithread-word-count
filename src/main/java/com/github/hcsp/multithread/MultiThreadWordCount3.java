@@ -30,8 +30,9 @@ public class MultiThreadWordCount3 {
 
         for (File file : files) {
             new Thread(() -> {
+                Map<String, Integer> fileMap = wordCount(file);
                 synchronized (MultiThreadWordCount3.class) {
-                    merge(finalResultMap, wordCount(file));
+                    merge(finalResultMap, fileMap);
                 }
                 latch.countDown();
             }).start();
