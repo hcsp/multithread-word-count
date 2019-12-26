@@ -44,7 +44,7 @@ public class MultiThreadWordCount1 {
 
         private Map<String, Integer> result = new HashMap<>();
 
-        public CountWord(BufferedReader bufferedReader) {
+        private CountWord(BufferedReader bufferedReader) {
             this.bufferedReader = bufferedReader;
         }
 
