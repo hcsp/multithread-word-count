@@ -17,7 +17,7 @@ public class MultiThreadWordCount3 {
     private static CountDownLatch done;
 
     //  使用threadNum个线程，并发统计文件中各单词的数量
-    public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException, RuntimeException {
         done = new CountDownLatch(files.size());
         ExecutorService service = Executors.newFixedThreadPool(threadNum);
         Map<String, Integer> result = new HashMap<>();
@@ -28,10 +28,9 @@ public class MultiThreadWordCount3 {
                 try {
                     temp = countSingleFile(file);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
                 synchronized (MultiThreadWordCount2.class) {
-                    assert temp != null;
                     mergeMap(result, temp);
                 }
                 done.countDown();
