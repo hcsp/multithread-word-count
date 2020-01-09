@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class MultiThreadWordCount5 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
@@ -38,7 +39,7 @@ public class MultiThreadWordCount5 {
 
 
         threadPool.shutdown();
-//        threadPool.awaitTermination(1, TimeUnit.MINUTES);
+        threadPool.awaitTermination(1, TimeUnit.MINUTES);
 
         return result;
     }
