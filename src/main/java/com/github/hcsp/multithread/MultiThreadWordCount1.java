@@ -9,11 +9,16 @@ import java.util.concurrent.*;
 
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    public HashMap<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException, FileNotFoundException {
+    public HashMap<String, Integer> count(int threadNum, List<File> files)  {
         ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         List<Future<HashMap<String, Integer>>> futures = new ArrayList<>();
         for (File file : files) {
-            BufferedReader fileReader = new BufferedReader(new FileReader(file));
+            BufferedReader fileReader = null;
+            try {
+                fileReader = new BufferedReader(new FileReader(file));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
             futures.addAll(wordsCountSingleFile(fileReader, threadPool, threadNum));
         }
         return resultMerge(futures);
