@@ -1,9 +1,6 @@
 package com.github.hcsp.multithread;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,38 +12,21 @@ public class MultiThreadWordCount5 {
     //    public static Map<String, Integer> count(int threadNum, List<File> files) {
     //        return null;
     //    }
-    private static List<Map<String, Integer>> results = new ArrayList<>();
-
-    public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {
+        List<Map<String, Integer>> results = new ArrayList<>();
         Map<String, Integer> countResult = new HashMap<>();
-        files.parallelStream().forEach(file -> {
-            try {
-                countResult(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        for (Map<String, Integer> result : results) {
-            mergeResulttoFinal(result, countResult);
+        buildDetector(threadNum, files, results);
+        Thread.sleep(100);
+        for (Map<String, Integer> waitforMerge : results) {
+            mergeResulttoFinal(waitforMerge, countResult);
         }
         return countResult;
     }
 
-    private static void countResult(File file) throws IOException {
-        Map<String, Integer> result = new HashMap<>();
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-        String line = "";
-        while ((line = bufferedReader.readLine()) != null) {
-            String[] split = line.split(" ");
-            for (String word : split) {
-                if (result.containsKey(word)) {
-                    result.put(word, result.get(word) + 1);
-                } else {
-                    result.put(word, 1);
-                }
-            }
+    private static void buildDetector(int threadNum, List<File> files, List<Map<String, Integer>> results) {
+        for (int i = 0; i < threadNum; i++) {
+            new FileDetector(results, null, files.get(i)).start();
         }
-        results.add(result);
     }
 
     private static void mergeResulttoFinal(Map<String, Integer> waitforMerge, Map<String, Integer> countResult) {
