@@ -19,9 +19,8 @@ public class MultiThreadWordCount1 {
                 for (int j = 0; j < threadNum; j++) {
                     futures.add(threadPool.submit(new CountWork(reader)));
                 }
-
             } catch (FileNotFoundException e) {
-
+                 throw new WordCountFileNotFoundException("count(int threadNum, List<File> files) 发生了异常",e);
             }
         }
 
@@ -51,6 +50,12 @@ public class MultiThreadWordCount1 {
                 }
             }
             return result;
+        }
+    }
+
+    static class WordCountFileNotFoundException extends RuntimeException{
+        public WordCountFileNotFoundException(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 
