@@ -4,31 +4,35 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 
-// CountDownLatch
-public class MultiThreadWordCount2 {
+// CyclicBarrier
+public class MultiThreadWordCount7 {
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException, BrokenBarrierException {
         Map<String, Integer> resultMap = new ConcurrentHashMap<>();
-        CountDownLatch countDownLatch = new CountDownLatch(files.size());
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(files.size() + 1);
         for (File file : files) {
             new Thread(() -> {
                 try {
                     Map<String, Integer> map = Common.countOneFile(file);
-                    synchronized (MultiThreadWordCount2.class) {
+                    synchronized (MultiThreadWordCount7.class) {
                         Common.mergeToMap(resultMap, map);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
-                } finally {
-                    countDownLatch.countDown();
+                }
+                try {
+                    cyclicBarrier.await();
+                } catch (InterruptedException | BrokenBarrierException e) {
+                    throw new RuntimeException(e);
                 }
             }).start();
         }
-        countDownLatch.await();
+        cyclicBarrier.await();
         return resultMap;
     }
 }
