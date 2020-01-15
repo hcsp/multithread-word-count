@@ -20,9 +20,8 @@ public class MultiThreadWordCount4 {
                 try {
                     return mapFuture.get();
                 } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
-                return null;
             }).collect(Collectors.toList());
             return MultiThreadWordCount1.merge(mapList);
         }

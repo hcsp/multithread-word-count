@@ -14,7 +14,7 @@ public class MultiThreadWordCount5 {
             try {
                 mapList.add(MultiThreadWordCount1.countOneFile(file));
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         });
 

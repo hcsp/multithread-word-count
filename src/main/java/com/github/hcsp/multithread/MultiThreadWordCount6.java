@@ -23,7 +23,7 @@ public class MultiThreadWordCount6 {
                     lock.acquire();
                     mapList.add(MultiThreadWordCount1.countOneFile(file));
                 } catch (InterruptedException | IOException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 } finally {
                     latch.countDown();
                     lock.release();
