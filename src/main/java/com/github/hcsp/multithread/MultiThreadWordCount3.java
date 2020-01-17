@@ -6,10 +6,3 @@ public class MultiThreadWordCount3 {
     //        return null;
     //    }
 }
-
-
-
-
-
-
-
