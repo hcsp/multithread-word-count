@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 public class MultiThreadWordCount2 {
-        //多线程线程操作files, 且文件内容也由多线程读取
+    //多线程线程操作files, 且文件内容也由多线程读取
     public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
         //创建files 的线程池
         ExecutorService threadPool = Executors.newFixedThreadPool(files.size());
@@ -40,7 +40,7 @@ public class MultiThreadWordCount2 {
         File file;
         int threadNum;
 
-        public FileWorkerJob(File file, int threadNum) {
+        FileWorkerJob(File file, int threadNum) {
             this.file = file;
             this.threadNum = threadNum;
         }

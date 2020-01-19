@@ -38,12 +38,12 @@ public class WordCount {
     }
 
     public static void mergeWorkerResultIntoFinalResult(Map<String, Integer> resultFromWorker,
-                                                  Map<String, Integer> finalResult) {
+                                                        Map<String, Integer> finalResult) {
         for (Map.Entry<String, Integer> entry :
                 resultFromWorker.entrySet()) {
             String word = entry.getKey();
 
-            int mergedResult = finalResult.getOrDefault(word, 0 ) + entry.getValue();
+            int mergedResult = finalResult.getOrDefault(word, 0) + entry.getValue();
             finalResult.put(word, mergedResult);
         }
     }
@@ -51,7 +51,7 @@ public class WordCount {
     static class WorkerJob implements Callable<Map<String, Integer>> {
         private BufferedReader reader;
 
-        public WorkerJob(BufferedReader reader) {
+        WorkerJob(BufferedReader reader) {
             this.reader = reader;
         }
 
