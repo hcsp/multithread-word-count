@@ -48,7 +48,7 @@ public class MultiThreadWordCount1 {
     static class WorkerJob implements Callable<Map<String, Integer>> {
         private BufferedReader bufferedReader;
 
-        public WorkerJob(BufferedReader bufferedReader) {
+        WorkerJob(BufferedReader bufferedReader) {
             this.bufferedReader = bufferedReader;
         }
 
