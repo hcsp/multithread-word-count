@@ -24,7 +24,7 @@ public class MultiThreadWordCount3 {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                     latch.countDown();
                 }
             }).start();

@@ -39,8 +39,8 @@ public class Utils {
         return result;
     }
 
-    static void mergeIntoFirstMap(Map<String, Integer> map1, Map<String, Integer> map2){
-        for(String key:map2.keySet()){
+    static void mergeIntoFirstMap(Map<String, Integer> map1, Map<String, Integer> map2) {
+        for (String key : map2.keySet()) {
             map1.put(key, map1.getOrDefault(key, 0) + map2.get(key));
         }
     }

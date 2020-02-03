@@ -17,12 +17,12 @@ public class MultiThreadWordCount4 {
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
 
         //这里是用线程池，多线程处理
-        for(File file:files){
+        for (File file : files) {
             futures.add(executorService.submit(() -> countFile(file)));
         }
         //这里是主线程，等待汇总结果，get实现了等待；
-        for(Future future:futures){
-            mergeIntoFirstMap(result,(Map<String, Integer>)future.get());
+        for (Future<Map<String, Integer>> future : futures) {
+            mergeIntoFirstMap(result, future.get());
         }
 
         return result;

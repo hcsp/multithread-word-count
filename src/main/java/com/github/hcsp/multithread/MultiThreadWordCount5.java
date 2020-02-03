@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 
 import static com.github.hcsp.multithread.Utils.countFile;
@@ -22,11 +21,11 @@ public class MultiThreadWordCount5 {
                 try {
                     Map<String, Integer> countResult = countFile(file);
                     synchronized (result) {
-                    mergeIntoFirstMap(result, countResult); //这里的map全是concurrentHashMap
+                        mergeIntoFirstMap(result, countResult); //这里的map全是concurrentHashMap
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                }finally {
+                } finally {
                     try {
                         cyclicBarrier.await();
                     } catch (InterruptedException | BrokenBarrierException e) {
