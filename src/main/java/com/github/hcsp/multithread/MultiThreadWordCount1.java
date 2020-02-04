@@ -10,19 +10,19 @@ import java.util.concurrent.*;
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
-        Map<String, Integer> finalResult = new HashMap<>();
+        List<Future<Map<String, Integer>>> futures = new ArrayList<>();
 
         for (File file : files) {
             BufferedReader reader = new BufferedReader(new FileReader(file));
-            List<Future<Map<String, Integer>>> futures = new ArrayList<>();
             ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
             for (int i = 0; i < threadNum; i++) {
                 futures.add(threadPool.submit(new WorkerJob(reader)));
             }
-            for (Future<Map<String, Integer>> future : futures) {
-                Map<String, Integer> resultFromWorker = future.get();
-                mergeWorkerResultIntoFinalResult(resultFromWorker, finalResult);
-            }
+        }
+
+        Map<String, Integer> finalResult = new HashMap<>();
+        for (Future<Map<String, Integer>> future : futures) {
+            mergeWorkerResultIntoFinalResult(future.get(), finalResult);
         }
         return finalResult;
     }
