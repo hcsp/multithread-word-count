@@ -9,15 +9,12 @@ import java.util.concurrent.*;
 
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    public static Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
+        ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
 
         for (File file : files) {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
-            for (int i = 0; i < threadNum; i++) {
-                futures.add(threadPool.submit(new WorkerJob(reader)));
-            }
+            futures.add(threadPool.submit(new WorkerJob(file)));
         }
 
         Map<String, Integer> finalResult = new HashMap<>();
@@ -36,14 +33,15 @@ public class MultiThreadWordCount1 {
     }
 
     static class WorkerJob implements Callable<Map<String, Integer>> {
-        BufferedReader reader;
+        File file;
 
-        WorkerJob(BufferedReader reader) {
-            this.reader = reader;
+        WorkerJob(File file) {
+            this.file = file;
         }
 
         @Override
         public Map<String, Integer> call() throws Exception {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
             Map<String, Integer> result = new HashMap<>();
             while ((line = reader.readLine()) != null) {
