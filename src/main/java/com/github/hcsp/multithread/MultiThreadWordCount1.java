@@ -30,7 +30,11 @@ public class MultiThreadWordCount1 {
                 }
             }
             Future<Map<String, Integer>> future = threadPool.submit(new task());
-            resultMap.putAll(future.get());
+
+            for (String word : future.get().keySet()) {
+                int mergedMapWordNum = future.get().get(word);
+                resultMap.put(word, resultMap.getOrDefault(word, 0) + mergedMapWordNum);
+            }
         }
         return resultMap;
     }
