@@ -5,16 +5,10 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class MultiThreadWordCount1 {
-    private final int threadNum;
-    private ExecutorService threadPool;
 
-    public MultiThreadWordCount1(int threadNum) {
-        this.threadNum = threadNum;
-        this.threadPool = Executors.newFixedThreadPool(threadNum);
-    }
-
-    public Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
         Vector<InputStream> inputStreamVercotr = new Vector<>();
+        ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         for (File file : files) {
             InputStream inputStream = new FileInputStream(file);
             inputStreamVercotr.add(inputStream);
