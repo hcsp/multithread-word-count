@@ -13,35 +13,29 @@ public class MultiThreadWordCount1 {
         this.threadPool = Executors.newFixedThreadPool(threadNum);
     }
 
-    public static void main(String[] args) throws FileNotFoundException, ExecutionException, InterruptedException {
-        File file = new File("C:\\Users\\25224\\Desktop\\text.txt.txt");
-        MultiThreadWordCount1 count2 = new MultiThreadWordCount1(10);
-        System.out.println(count2.count(10, file));
-
-    }
-
-    public Map<String, Integer> count(int threadNum, File file) throws FileNotFoundException, ExecutionException, InterruptedException {
-
+    public Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
+        Vector<InputStream> inputStreamVercotr = new Vector<>();
+        for (File file : files) {
+            InputStream inputStream = new FileInputStream(file);
+            inputStreamVercotr.add(inputStream);
+        }
+        SequenceInputStream sequenceInputStream = new SequenceInputStream(inputStreamVercotr.elements());
         Map<String, Integer> finalResult = new HashMap<>();
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new FileReader(file));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(sequenceInputStream));
         for (int i = 0; i < threadNum; i++) {
-            futures.add(threadPool.submit(new Callable<Map<String, Integer>>() {
-                @Override
-                public Map<String, Integer> call() throws Exception {
-                    String line = null;
-                    Map<String, Integer> result = new HashMap<>();
-                    while ((line = reader.readLine()) != null) {
-                        String[] words = line.split("");
-                        for (String word : words) {
-                            if (result.containsKey(word)) {
-                                result.put(word, result.getOrDefault(word, 0) + 1);
-                            }
+            futures.add(threadPool.submit(() -> {
+                String line = null;
+                Map<String, Integer> result = new HashMap<>();
+                while ((line = reader.readLine()) != null) {
+                    String[] words = line.split(" ");
+                    for (String word : words) {
+                        {
+                            result.put(word, result.getOrDefault(word, 0) + 1);
                         }
-
                     }
-                    return result;
                 }
+                return result;
             }));
         }
         for (Future<Map<String, Integer>> map : futures) {
