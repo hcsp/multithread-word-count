@@ -43,8 +43,8 @@ public class MultiThreadWordCount4 {
         List<File> fileList;
         BlockingQueue<Map<String, Integer>> resultQueue;
 
-        public CountCallable(List<File> fileQueue) {
-            this.fileList = fileQueue;
+        CountCallable(List<File> fileList) {
+            this.fileList = fileList;
             this.resultQueue = new LinkedBlockingQueue<>();
         }
 

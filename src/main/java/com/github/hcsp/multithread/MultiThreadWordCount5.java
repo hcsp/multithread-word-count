@@ -20,7 +20,7 @@ public class MultiThreadWordCount5 {
 
         List<File> fileList;
 
-        public CountTask(List<File> fileList) {
+        CountTask(List<File> fileList) {
             this.fileList = fileList;
         }
 
