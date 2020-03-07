@@ -27,7 +27,7 @@ public class MultiThreadWordCount2 {
         HashMap<String, Integer> finalMap = new HashMap<>();
         futures.forEach(future -> {
             try {
-                mergeMapToMap(future.get(), finalMap);
+                ReaderUtils.mergeMapToMap(future.get(), finalMap);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -52,11 +52,5 @@ public class MultiThreadWordCount2 {
             }
             return map;
         }
-    }
-
-    private static void mergeMapToMap(HashMap<String, Integer> map, HashMap<String, Integer> finalMap) {
-        map.forEach((key, val) -> {
-            finalMap.put(key, finalMap.getOrDefault(key, 0) + val);
-        });
     }
 }

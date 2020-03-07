@@ -18,10 +18,10 @@ public class MultiThreadWordCount1 {
             for (int i = 0; i < threadNum; i++) {
                 Thread worker = new Worker(bf, concurrentHashMap);
                 threads.add(worker);
+                worker.start();
             }
             threads.forEach(thread -> {
                 try {
-                    thread.start();
                     thread.join();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
