@@ -14,8 +14,10 @@ public class MultiThreadWordCount5 {
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         List<Thread> threads = new ArrayList<>();
         List<List<File>> group = groupFiles(files, threadNum);
-        group.forEach(item -> {
-            threads.add(new Thread(() -> ReaderUtils.readFilesToMap(item, concurrentHashMap)));
+        group.forEach(fileList -> {
+            Thread t = new Thread(() -> ReaderUtils.readFilesToMap(fileList, concurrentHashMap));
+            t.start();
+            threads.add(t);
         });
         threads.forEach(thread -> {
             try {
@@ -35,7 +37,7 @@ public class MultiThreadWordCount5 {
             fileList.add(files.get(i));
             if ((i + 1) % capacity == 0) {
                 group.add(fileList);
-                fileList.clear();
+                fileList = new ArrayList<>();
             }
         }
         return group;

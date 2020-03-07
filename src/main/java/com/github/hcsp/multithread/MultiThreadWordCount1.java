@@ -35,7 +35,7 @@ public class MultiThreadWordCount1 {
         private BufferedReader bf;
         private ConcurrentHashMap<String, Integer> concurrentHashMap;
 
-        public Worker(BufferedReader bf, ConcurrentHashMap<String, Integer> concurrentHashMap) {
+        Worker(BufferedReader bf, ConcurrentHashMap<String, Integer> concurrentHashMap) {
             this.bf = bf;
             this.concurrentHashMap = concurrentHashMap;
         }

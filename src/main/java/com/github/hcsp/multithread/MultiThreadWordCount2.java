@@ -38,7 +38,7 @@ public class MultiThreadWordCount2 {
     static class Worker implements Callable<HashMap<String, Integer>> {
         private BufferedReader bf;
 
-        public Worker(BufferedReader bf) {
+        Worker(BufferedReader bf) {
             this.bf = bf;
         }
 

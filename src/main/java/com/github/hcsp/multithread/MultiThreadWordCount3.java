@@ -28,7 +28,7 @@ public class MultiThreadWordCount3 {
         private BufferedReader bf;
         private CountDownLatch count;
 
-        public Worker(BufferedReader bf, CountDownLatch count) {
+        Worker(BufferedReader bf, CountDownLatch count) {
             this.bf = bf;
             this.count = count;
         }
