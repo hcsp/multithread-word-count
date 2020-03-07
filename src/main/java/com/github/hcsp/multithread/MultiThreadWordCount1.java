@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 
 public class MultiThreadWordCount1 {
     private static ConcurrentHashMap<String, Integer> concurrentHashMap = new ConcurrentHashMap<>();
@@ -47,6 +46,7 @@ public class MultiThreadWordCount1 {
                 ReaderUtils.readFileToConcurrencyMap(bf, concurrentHashMap);
             } catch (IOException e) {
                 e.printStackTrace();
+
             }
         }
     }
