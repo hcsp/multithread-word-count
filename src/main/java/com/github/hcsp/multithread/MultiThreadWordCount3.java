@@ -18,20 +18,6 @@ public class MultiThreadWordCount3 {
             BufferedReader br = new BufferedReader(new FileReader(file));
             for (int i = 0; i < threadNum; i++) {
                 new Worker(br, count).start();
-//                new Thread(() -> {
-//                    try {
-//                        String line;
-//                        while ((line = br.readLine()) != null) {
-//                            String[] words = line.split(" ");
-//                            for (String word : words) {
-//                                concurrentHashMap.put(word, concurrentHashMap.getOrDefault(word, 0) + 1);
-//                            }
-//                        }
-//                        count.countDown();
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }).start();
             }
             count.await();
         }
