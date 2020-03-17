@@ -14,36 +14,6 @@ public class MultiThreadWordCount1 {
         this.threadNum = threadNum;
     }
 
-  /*  public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
-        List files = new ArrayList();
-
-
-        File file1 = new File("1.txt");
-        String absolutePath = file1.getPath().split("1.txt")[0];
-
-        System.out.println(absolutePath);
-        *//*files.add(new File(absolutePath+"1.txt"));
-        files.add(new File(absolutePath+"2.txt"));
-        files.add(new File(absolutePath+"3.txt"));*//*
-
-
-        MultiThreadWordCount1 multiThreadWordCount1 = new MultiThreadWordCount1(3);
-
-        Map count = multiThreadWordCount1.count(3, files);
-
-        System.out.println(count);
-        for (int i = 1; i < 4; i++) {
-            Reader reader = new BufferedReader(new FileReader(MultiThreadWordCount1.class.getClassLoader().getResource("")+"\\"+i + ".txt"));
-            String line = ((BufferedReader) reader).readLine();
-            System.out.println(line);
-        }
-
-
-        multiThreadWordCount1.threadPool.shutdown();
-
-
-    }*/
-
 
     public Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
         List<Map<String, Integer>> resultList = new ArrayList<>();
