@@ -7,17 +7,23 @@ import java.util.concurrent.*;
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
     private final int threadNum;
-    private ExecutorService threadPool;
 
     public MultiThreadWordCount1(int threadNum) {
-        threadPool = Executors.newFixedThreadPool(threadNum);
         this.threadNum = threadNum;
     }
 
+    public int getThreadNum() {
+        return threadNum;
+    }
 
-    public Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
+
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
+
+        ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
+
         List<Map<String, Integer>> resultList = new ArrayList<>();
         Map<String, Integer> lastMap = new HashMap<>();
+
 
         for (File file : files) {
             BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -33,7 +39,7 @@ public class MultiThreadWordCount1 {
                             String[] words = line.split(" ");
 
                             for (String word : words) {
-                                result.put(word, result.getOrDefault(word, 1));
+                                result.put(word, result.getOrDefault(word, 0) + 1);
                             }
                         }
                         return result;
@@ -76,6 +82,7 @@ public class MultiThreadWordCount1 {
 
 
         //返回最终返回语句
+        threadPool.shutdown();
         return lastMap;
 
     }
