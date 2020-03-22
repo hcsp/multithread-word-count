@@ -15,8 +15,11 @@ public class MultiThreadWordCount1 {
         List<List<File>> taskGroup = new ArrayList<>();
 
         // 分配任务
-        if (files.size() < threadNum) {
+        if (files.size() <= threadNum) {
             threadNum = files.size();
+            for (File file : files) {
+                taskGroup.add(Arrays.asList(file));
+            }
         } else if (files.size() > threadNum) {
             int averageNumber = files.size() / threadNum;
             int index = files.size() % threadNum;
@@ -76,22 +79,22 @@ public class MultiThreadWordCount1 {
             resultMap.put(key, oneFileResultMap.getOrDefault(key, oneFileResultMap.get(key)));
         }
     }
-//
-//    public static void main(String[] args) throws InterruptedException {
-//        List<File> files = Arrays.asList(
-//            new File("1.txt"),
-//            new File("1.txt"),
-//            new File("1.txt"),
-//            new File("1.txt"),
-//            new File("1.txt"),
-//            new File("1.txt"),
-//            new File("1.txt"),
-//            new File("1.txt")
-//        );
-//        Map<String, Integer> count = count(3, files);
-//        System.out.println(count);
-//
-//
-//    }
+
+    public static void main(String[] args) throws InterruptedException {
+        List<File> files = Arrays.asList(
+            new File("1.txt"),
+            new File("1.txt"),
+            new File("1.txt"),
+            new File("1.txt"),
+            new File("1.txt"),
+            new File("1.txt"),
+            new File("1.txt"),
+            new File("1.txt")
+        );
+        Map<String, Integer> count = count(8, files);
+        System.out.println(count);
+
+
+    }
 
 }
