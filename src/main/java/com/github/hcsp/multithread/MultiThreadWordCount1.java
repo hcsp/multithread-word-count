@@ -10,7 +10,6 @@ public class MultiThreadWordCount1 {
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {
-        // 使用Synchronized来实现
         ConcurrentHashMap<String, Integer> result = new ConcurrentHashMap<>();
         List<List<File>> taskGroup = new ArrayList<>();
 
@@ -46,7 +45,7 @@ public class MultiThreadWordCount1 {
         private ConcurrentHashMap<String, Integer> result;
         private List<File> targetFiles;
 
-        public Counter(ConcurrentHashMap<String, Integer> result, List<File> targetFiles) {
+        Counter(ConcurrentHashMap<String, Integer> result, List<File> targetFiles) {
             this.result = result;
             this.targetFiles = targetFiles;
         }
@@ -80,21 +79,21 @@ public class MultiThreadWordCount1 {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        List<File> files = Arrays.asList(
-            new File("1.txt"),
-            new File("1.txt"),
-            new File("1.txt"),
-            new File("1.txt"),
-            new File("1.txt"),
-            new File("1.txt"),
-            new File("1.txt"),
-            new File("1.txt")
-        );
-        Map<String, Integer> count = count(8, files);
-        System.out.println(count);
-
-
-    }
+//    public static void main(String[] args) throws InterruptedException {
+//        List<File> files = Arrays.asList(
+//            new File("1.txt"),
+//            new File("1.txt"),
+//            new File("1.txt"),
+//            new File("1.txt"),
+//            new File("1.txt"),
+//            new File("1.txt"),
+//            new File("1.txt"),
+//            new File("1.txt")
+//        );
+//        Map<String, Integer> count = count(8, files);
+//        System.out.println(count);
+//
+//
+//    }
 
 }
