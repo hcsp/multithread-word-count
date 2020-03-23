@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveTask;
 
 public class MultiThreadWordCount6 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
