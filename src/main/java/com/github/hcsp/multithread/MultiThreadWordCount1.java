@@ -10,29 +10,30 @@ import java.util.concurrent.*;
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
-        ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
-        List<Map<String, Integer>> finalResultList = new ArrayList<>();
+        ExecutorService threadPool = Executors.newFixedThreadPool(threadNum*threadNum);
+        List<Future<Map<String, Integer>>> futures_1 = new ArrayList<>();
         Map<String, Integer> finalResult = new HashMap<>();
         for (File file : files) {
-
-            List<Future<Map<String, Integer>>> futures = new ArrayList<>();
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            for (int i = 0; i < threadNum; i++) {
-                futures.add(threadPool.submit(new WorkerJob(reader)));
-            }
-            Map<String, Integer> tempResult = new HashMap<>();
-            for (Future<Map<String, Integer>> future : futures) {
-                Map<String, Integer> resultFromWorker = future.get();
-                mergeWorkerResultIntoFinalResult(resultFromWorker, tempResult);
-            }
-            finalResultList.add(tempResult);
+            futures_1.add(threadPool.submit(() -> {
+                List<Future<Map<String, Integer>>> futures = new ArrayList<>();
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                for (int i = 0; i < threadNum; i++) {
+                    futures.add(threadPool.submit(new WorkerJob(reader)));
+                }
+                Map<String, Integer> tempResult = new HashMap<>();
+                mergeFuturesIntoResult(futures,tempResult);
+                return tempResult;
+            }));
         }
-        for (Map<String, Integer> stringIntegerMap : finalResultList) {
-            mergeWorkerResultIntoFinalResult(stringIntegerMap, finalResult);
-        }
+        mergeFuturesIntoResult(futures_1,finalResult);
         return finalResult;
     }
-
+    private static void mergeFuturesIntoResult(List<Future<Map<String,Integer>>> futures,Map<String,Integer> result) throws ExecutionException, InterruptedException {
+        for (Future<Map<String, Integer>> future : futures) {
+            Map<String, Integer> resultFromWorker = future.get();
+            mergeWorkerResultIntoFinalResult(resultFromWorker, result);
+        }
+    }
     private static void mergeWorkerResultIntoFinalResult(Map<String, Integer> resultFromWorker,
                                                          Map<String, Integer> finalResult) {
         for (Map.Entry<String, Integer> entry : resultFromWorker.entrySet()) {
