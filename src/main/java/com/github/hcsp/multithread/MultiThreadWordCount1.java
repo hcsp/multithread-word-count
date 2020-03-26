@@ -19,7 +19,7 @@ public class MultiThreadWordCount1 {
         ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
 
-        ExecuteCountWordsJob(threadNum, files, threadPool, futures);
+        executeCountWordsJob(threadNum, files, threadPool, futures);
         return getFinalResult(futures);
     }
 
@@ -34,12 +34,10 @@ public class MultiThreadWordCount1 {
         return finalResult;
     }
 
-    private static void ExecuteCountWordsJob(int threadNum, List<File> files, ExecutorService threadPool, List<Future<Map<String, Integer>>> futures) throws FileNotFoundException {
+    private static void executeCountWordsJob(int threadNum, List<File> files, ExecutorService threadPool, List<Future<Map<String, Integer>>> futures) throws FileNotFoundException {
         for (File file : files) {
             BufferedReader reader = new BufferedReader(new FileReader(file));
-            for (int j = 0; j < threadNum; j++) {
-                futures.add(threadPool.submit(new CountWordsJob(reader)));
-            }
+            futures.add(threadPool.submit(new CountWordsJob(reader)));
         }
     }
 
