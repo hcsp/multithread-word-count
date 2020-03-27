@@ -19,9 +19,12 @@ public class MultiThreadWordCount1 {
         for (File file : files) {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
             List<Future<Map<String, Integer>>> futures = new ArrayList<>();
+
+            //创建线程
             for (int i = 0; i < threadNum; i++) {
                 futures.add(threadPool.submit(new WorkerJob(bufferedReader)));
             }
+            //遍历线程的结果并进行整合
             for (Future<Map<String, Integer>> future : futures) {
                 Map<String, Integer> resultFromWorker = future.get();
                 mergeWorkerResultIntoFinalResult(resultFromWorker, finalResult);
