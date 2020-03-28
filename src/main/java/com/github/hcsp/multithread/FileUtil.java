@@ -1,6 +1,9 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +13,7 @@ public class FileUtil {
     public static Map<String, Integer> work(File file) {
         Map<String, Integer> wordCount = new HashMap<>();
         BufferedReader reader;
+
         try {
             String line;
             reader = new BufferedReader(new FileReader(file));
@@ -21,9 +25,11 @@ public class FileUtil {
                     wordCount.put(word, count);
                 }
             }
+
         } catch (IOException e) {
             throw new RuntimeException("异常信息:" + e.getMessage());
         }
+
         return wordCount;
     }
 
@@ -32,6 +38,8 @@ public class FileUtil {
         for (String key : keys) {
             source.put(key, source.getOrDefault(key, 0) + target.get(key));
         }
+
         return source;
     }
+
 }
