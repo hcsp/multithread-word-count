@@ -1,9 +1,7 @@
 package com.github.hcsp.multithread;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,66 +10,45 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MultiThreadWordCount1 {
+
+    private static Map<String, Integer> totalResult = new HashMap<>();
+
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException, FileNotFoundException {
-        CountDownLatch latch = new CountDownLatch(1);
-        WordCounter counter = new WordCounter(files.size(), latch);
-        new Thread(counter).start();
+        CountDownLatch timer = new CountDownLatch(files.size());
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
 
         for (File file : files) {
             BufferedReader reader = new BufferedReader(new FileReader(file));
-            executorService.execute(new WordRunner(reader, counter));
+            executorService.execute(new WordRunner(reader, timer));
         }
 
-        latch.await();
-        return counter.totalResult;
+        System.out.println("Start counting...");
+        timer.await();
+        System.out.println("All the files Counting Done");
+        executorService.shutdown();
+        return totalResult;
     }
 
-    public static class WordCounter implements Runnable {
-
-        private CountDownLatch timer;
-        private CountDownLatch latch;
-        Map<String, Integer> totalResult;
-
-        public WordCounter(int count, CountDownLatch latch) {
-            this.timer = new CountDownLatch(count);
-            this.totalResult = new HashMap<>();
-            this.latch = latch;
+    private static synchronized void mergeResult(Map<String, Integer> result, CountDownLatch timer) {
+        System.out.println("Merging result...");
+        for (Map.Entry<String, Integer> entry : result.entrySet()) {
+            int value = totalResult.getOrDefault(entry.getKey(), 0) + entry.getValue();
+            totalResult.put(entry.getKey(), value);
         }
-
-        public synchronized void mergeResult(Map<String, Integer> result) {
-            System.out.println("Merging result...");
-            for (Map.Entry<String, Integer> entry : result.entrySet()) {
-                int value = totalResult.getOrDefault(entry.getKey(), 0) + entry.getValue();
-                totalResult.put(entry.getKey(), value);
-            }
-            timer.countDown();
-            System.out.println("Left files count " + timer.getCount());
-        }
-
-        @Override
-        public void run() {
-            try {
-                System.out.println("Start counting...");
-                timer.await();
-                System.out.println("All the files Counting Done");
-                latch.countDown();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+        timer.countDown();
+        System.out.println("Left files count " + timer.getCount());
     }
 
-    public static class WordRunner implements Runnable {
+    static class WordRunner implements Runnable {
 
-        private WordCounter counter;
         private BufferedReader reader;
+        private CountDownLatch timer;
 
-        public WordRunner(BufferedReader reader, WordCounter counter) {
+        WordRunner(BufferedReader reader, CountDownLatch timer) {
             this.reader = reader;
-            this.counter = counter;
+            this.timer = timer;
         }
 
         @Override
@@ -86,7 +63,7 @@ public class MultiThreadWordCount1 {
                         result.put(word, count + 1);
                     }
                 }
-                counter.mergeResult(result);
+                mergeResult(result, timer);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

@@ -17,19 +17,20 @@ public class MultiThreadWordCount2 {
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException {
-        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(threadNum);
+        ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
         Map<String, Integer> wordsCount = new HashMap<>();
 
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         for (File file : files) {
             BufferedReader reader = new BufferedReader(new FileReader(file));
-            futures.add(fixedThreadPool.submit(new WordCounter(reader)));
+            futures.add(executorService.submit(new WordRunner(reader)));
         }
 
         for (Future<Map<String, Integer>> future : futures) {
             mergeWordsCount(wordsCount, future);
         }
 
+        executorService.shutdown();
         return wordsCount;
     }
 
@@ -45,11 +46,11 @@ public class MultiThreadWordCount2 {
         }
     }
 
-    public static class WordCounter implements Callable<Map<String, Integer>> {
+    static class WordRunner implements Callable<Map<String, Integer>> {
 
         private BufferedReader reader;
 
-        public WordCounter(BufferedReader reader) {
+        WordRunner(BufferedReader reader) {
             this.reader = reader;
         }
 
