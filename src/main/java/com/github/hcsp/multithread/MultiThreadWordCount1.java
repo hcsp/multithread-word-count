@@ -5,13 +5,13 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class MultiThreadWordCount1 {
-    private final ExecutorService threadPool;
+    private static ExecutorService threadPool;
 
     public MultiThreadWordCount1(int threadNum) {
-        this.threadPool = Executors.newFixedThreadPool(threadNum);
+        threadPool = Executors.newFixedThreadPool(threadNum);
     }
 
-    public Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         for (File file : files) {
             futures.add(threadPool.submit(new WorkerJob(file)));
@@ -22,6 +22,7 @@ public class MultiThreadWordCount1 {
             mergeWorkerResultToFinalResult(finalResult, future.get());
         }
 
+        threadPool.shutdown();
         return finalResult;
 
     }
@@ -49,8 +50,8 @@ public class MultiThreadWordCount1 {
     }
 
 
-    private void mergeWorkerResultToFinalResult(Map<String, Integer> finalResult,
-                                                Map<String, Integer> resultFromWork) {
+    private static void mergeWorkerResultToFinalResult(Map<String, Integer> finalResult,
+                                                       Map<String, Integer> resultFromWork) {
         Set<String> keys = resultFromWork.keySet();
         for (String key : keys) {
             finalResult.put(key, finalResult.getOrDefault(key, 0) + resultFromWork.get(key));
@@ -71,7 +72,7 @@ public class MultiThreadWordCount1 {
         MultiThreadWordCount1 multiThreadWordCount1 = new MultiThreadWordCount1(2);
         Map<String, Integer> results = multiThreadWordCount1.count(2, files);
         System.out.println(results);
-
+        threadPool.shutdown();
     }
 
 

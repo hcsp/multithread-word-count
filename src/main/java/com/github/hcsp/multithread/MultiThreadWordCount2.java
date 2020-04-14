@@ -8,10 +8,11 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 public class MultiThreadWordCount2 {
+    private static ForkJoinPool forkJoinPool;
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
         Map<String, Integer> finalResult = new HashMap<>();
-        ForkJoinPool forkJoinPool = new ForkJoinPool(threadNum);
+        forkJoinPool = new ForkJoinPool(threadNum);
         List<ForkJoinTask<Map<String, Integer>>> resultFromWorkers = new ArrayList<>();
         for (File file : files) {
             resultFromWorkers.add(forkJoinPool.submit(new WorkerJob(file)));
@@ -21,7 +22,7 @@ public class MultiThreadWordCount2 {
             mergeWorkerJobToFinalResult(finalResult, result.join());
         }
 
-
+        forkJoinPool.shutdown();
         return finalResult;
     }
 
@@ -60,15 +61,16 @@ public class MultiThreadWordCount2 {
         }
     }
 
-    public static void main(String[] args) throws FileNotFoundException, ExecutionException, InterruptedException {
-        List<File> files = new ArrayList<>();
-        for (int i = 1; i < 3; i++) {
-            File file = new File("C:\\Users\\Dandan\\IdeaProjects\\multithread-word-count\\" + i + ".txt");
-            files.add(file);
-        }
-        MultiThreadWordCount1 multiThreadWordCount1 = new MultiThreadWordCount1(2);
-        Map<String, Integer> results = multiThreadWordCount1.count(2, files);
-        System.out.println(results);
-
-    }
+//    public static void main(String[] args) throws FileNotFoundException, ExecutionException, InterruptedException {
+//        List<File> files = new ArrayList<>();
+//        for (int i = 1; i < 3; i++) {
+//            File file = new File("C:\\Users\\Dandan\\IdeaProjects\\multithread-word-count\\" + i + ".txt");
+//            files.add(file);
+//        }
+//        MultiThreadWordCount1 multiThreadWordCount1 = new MultiThreadWordCount1(2);
+//        Map<String, Integer> results = multiThreadWordCount1.count(2, files);
+//        System.out.println(results);
+//
+//
+//    }
 }
