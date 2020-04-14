@@ -1,13 +1,11 @@
 package com.github.hcsp.multithread;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +16,7 @@ public class MultiThreadWordCount3 {
     static ReentrantLock lock = new ReentrantLock();
     static Condition NotAllWorkersFinished = lock.newCondition();
 
-    // 使用threadNum个线程，并发统计文件中各单词的数量
+     //使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {
         Map<String, Integer> finalResult = new HashMap<>();
         AtomicInteger counter = new AtomicInteger(files.size());
@@ -33,7 +31,7 @@ public class MultiThreadWordCount3 {
         lock.lock();
         try {
             //如果有线程没工作完成，就等待
-            if (counter.get() > 0) {
+            while (counter.get() > 0) {
                 NotAllWorkersFinished.await();
             }
             //如果都工作完了就开始合并线程的结果
@@ -81,16 +79,16 @@ public class MultiThreadWordCount3 {
         }
     }
 
-    public static void main(String[] args) throws FileNotFoundException, ExecutionException, InterruptedException {
-        List<File> files = new ArrayList<>();
-        for (int i = 1; i < 3; i++) {
-            File file = new File("C:\\Users\\Dandan\\IdeaProjects\\multithread-word-count\\" + i + ".txt");
-            files.add(file);
-        }
-        MultiThreadWordCount1 multiThreadWordCount1 = new MultiThreadWordCount1(2);
-        Map<String, Integer> results = multiThreadWordCount1.count(2, files);
-        System.out.println(results);
-
-    }
+//    public static void main(String[] args) throws FileNotFoundException, ExecutionException, InterruptedException {
+//        List<File> files = new ArrayList<>();
+//        for (int i = 1; i < 3; i++) {
+//            File file = new File("C:\\Users\\Dandan\\IdeaProjects\\multithread-word-count\\" + i + ".txt");
+//            files.add(file);
+//        }
+//
+//        Map<String, Integer> results = MultiThreadWordCount3.ultiThreadWordCount1.count(2, files);
+//        System.out.println(results);
+//
+//    }
 
 }

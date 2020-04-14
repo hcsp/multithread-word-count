@@ -5,13 +5,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class MultiThreadWordCount1 {
-    private static ExecutorService threadPool;
-
-    public MultiThreadWordCount1(int threadNum) {
-        threadPool = Executors.newFixedThreadPool(threadNum);
-    }
-
     public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
+        ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         for (File file : files) {
             futures.add(threadPool.submit(new WorkerJob(file)));
@@ -63,17 +58,17 @@ public class MultiThreadWordCount1 {
 //        }
     }
 
-    public static void main(String[] args) throws FileNotFoundException, ExecutionException, InterruptedException {
-        List<File> files = new ArrayList<>();
-        for (int i = 1; i < 3; i++) {
-            File file = new File("C:\\Users\\Dandan\\IdeaProjects\\multithread-word-count\\" + i + ".txt");
-            files.add(file);
-        }
-        MultiThreadWordCount1 multiThreadWordCount1 = new MultiThreadWordCount1(2);
-        Map<String, Integer> results = multiThreadWordCount1.count(2, files);
-        System.out.println(results);
-        threadPool.shutdown();
-    }
+//    public static void main(String[] args) throws FileNotFoundException, ExecutionException, InterruptedException {
+//        List<File> files = new ArrayList<>();
+//        for (int i = 1; i < 3; i++) {
+//            File file = new File("C:\\Users\\Dandan\\IdeaProjects\\multithread-word-count\\" + i + ".txt");
+//            files.add(file);
+//        }
+//        MultiThreadWordCount1 multiThreadWordCount1 = new MultiThreadWordCount1(2);
+//        Map<String, Integer> results = multiThreadWordCount1.count(2, files);
+//        System.out.println(results);
+//        threadPool.shutdown();
+//    }
 
 
 }

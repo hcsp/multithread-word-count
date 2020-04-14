@@ -8,11 +8,10 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 public class MultiThreadWordCount2 {
-    private static ForkJoinPool forkJoinPool;
-    // 使用threadNum个线程，并发统计文件中各单词的数量
+     //使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
         Map<String, Integer> finalResult = new HashMap<>();
-        forkJoinPool = new ForkJoinPool(threadNum);
+        ForkJoinPool forkJoinPool = new ForkJoinPool(threadNum);
         List<ForkJoinTask<Map<String, Integer>>> resultFromWorkers = new ArrayList<>();
         for (File file : files) {
             resultFromWorkers.add(forkJoinPool.submit(new WorkerJob(file)));
