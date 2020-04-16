@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -21,6 +22,14 @@ public class ReadFileUtils {
                 map.put(word, map.getOrDefault(word, 0) + 1);
             }
         }
+    }
+
+    public static Map<String, Integer> mergeMap(Map<String, Integer> result, Map<String, Integer> source) {
+        Set<String> strings = source.keySet();
+        for (String key : strings) {
+            result.put(key, result.getOrDefault(key, 0) + source.get(key));
+        }
+        return result;
     }
 
     private static final int REPEAT = 100;

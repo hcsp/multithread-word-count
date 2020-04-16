@@ -13,12 +13,11 @@ public class MultiThreadWordCount2 {
         List<Map<String, Integer>> mapList = new ArrayList<>();
 
         List<ReadFileWithThread> threads = new ArrayList<>();
+
         for (File file : files) {
-            for (int i = 0; i < threadNum; i++) {
-                ReadFileWithThread readFileThread = new ReadFileWithThread(file);
-                threads.add(readFileThread);
-                readFileThread.start();
-            }
+            ReadFileWithThread readFileThread = new ReadFileWithThread(file);
+            threads.add(readFileThread);
+            readFileThread.start();
         }
 
         for (ReadFileWithThread thread : threads) {
@@ -30,17 +29,10 @@ public class MultiThreadWordCount2 {
             }
         }
 
-        mapAdd(result, mapList);
-        return result;
-    }
-
-    private static void mapAdd(Map<String, Integer> result, List<Map<String, Integer>> wordCountMapList) {
-        for (Map<String, Integer> wordCountMap : wordCountMapList) {
-            for (Map.Entry<String, Integer> entry : wordCountMap.entrySet()) {
-
-                result.put(entry.getKey(), result.getOrDefault(entry.getKey(), 0) + entry.getValue());
-            }
+        for (Map<String, Integer> source : mapList) {
+            ReadFileUtils.mergeMap(result, source);
         }
+        return result;
     }
 
     public static void main(String[] args) {

@@ -4,11 +4,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.Callable;
 
 public class MultiThreadWordCount5 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
@@ -23,14 +28,8 @@ public class MultiThreadWordCount5 {
             } catch (FileNotFoundException e) {
                 throw new RuntimeException("file is not found: " + file.getName());
             }
-            for (int i = 0; i < threadNum; i++) {
+            wordCountMapList.add(threadPool.submit(new ReadFileWithCallable(reader)));
 
-                try {
-                    wordCountMapList.add(threadPool.submit(new ReadFileWithCallable(reader)));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
         mergeResult(wordCountMap, wordCountMapList);
@@ -52,6 +51,21 @@ public class MultiThreadWordCount5 {
                     wordCountMap.put(entry.getKey(), wordCountMap.getOrDefault(entry.getKey(), 0) + entry.getValue());
                 }
             }
+        }
+    }
+
+    public static class ReadFileWithCallable implements Callable<Map<String, Integer>> {
+        private BufferedReader reader;
+        private Map<String, Integer> map = new HashMap<>();
+
+        public ReadFileWithCallable(BufferedReader reader) {
+            this.reader = reader;
+        }
+
+        @Override
+        public Map<String, Integer> call() throws Exception {
+            ReadFileUtils.readWordsToMap(map, reader);
+            return map;
         }
     }
 }
