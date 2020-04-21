@@ -23,14 +23,14 @@ public class MultiThreadWordCount2 {
         CountDownLatch countDownLatch = new CountDownLatch(files.size());
         for (File file : files) {
             List<Map<String, Integer>> finalResultList = resultList;
-            new Thread(()->{
+            new Thread(() -> {
                 Map<String, Integer> map = count(file);
                 finalResultList.add(map);
                 countDownLatch.countDown();
             }).start();
         }
         countDownLatch.await();
-        for(Map<String, Integer> map : resultList){
+        for (Map<String, Integer> map : resultList) {
             resultMap = merge(resultMap, map);
         }
         System.out.println(resultMap);

@@ -4,6 +4,7 @@ import javax.sound.midi.Soundbank;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.*;
+
 import static com.github.hcsp.multithread.MultiThreadWordCount5.count;
 import static com.github.hcsp.multithread.MultiThreadWordCount5.merge;
 
@@ -41,7 +42,7 @@ public class MultiThreadWordCount3 {
 
         @Override
         protected Map<String, Integer> compute() {
-            if(files.isEmpty()){
+            if (files.isEmpty()) {
                 return Collections.emptyMap();
             }
             Map<String, Integer> map = count(files.get(0));

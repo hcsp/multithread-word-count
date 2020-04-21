@@ -27,29 +27,30 @@ public class MultiThreadWordCount5 {
         return map;
     }
 
-    public static Map<String, Integer> merge(Map<String, Integer> result, Map<String, Integer> map){
+    public static Map<String, Integer> merge(Map<String, Integer> result, Map<String, Integer> map) {
         Set<String> words = new HashSet<>(result.keySet());
         words.addAll(map.keySet());
         Map<String, Integer> newResult = new HashMap<>();
         for (String word : words) {
-            newResult.put(word, result.getOrDefault(word, 0)+map.getOrDefault(word, 0));
+            newResult.put(word, result.getOrDefault(word, 0) + map.getOrDefault(word, 0));
         }
         return newResult;
     }
 
     public static void main(String[] args) {
         List<File> files = Arrays.asList(
-            new File("src/main/java/com/github/hcsp/multithread/1.txt"),
-            new File("src/main/java/com/github/hcsp/multithread/2.txt"),
-            new File("src/main/java/com/github/hcsp/multithread/3.txt")
+                new File("src/main/java/com/github/hcsp/multithread/1.txt"),
+                new File("src/main/java/com/github/hcsp/multithread/2.txt"),
+                new File("src/main/java/com/github/hcsp/multithread/3.txt")
         );
         //ExecutorService threadPool = Executors.newFixedThreadPool(files.size());
         ExecutorService threadPool = new ThreadPoolExecutor(files.size(), files.size(),
                 120, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-                (runnable)->{
+                (runnable) -> {
                     Thread factory = new Thread(runnable);
                     factory.setDaemon(true);
-                    return factory;});
+                    return factory;
+                });
         Map<String, Integer> resultMap = new HashMap<>();
         for (File file : files) {
             try {

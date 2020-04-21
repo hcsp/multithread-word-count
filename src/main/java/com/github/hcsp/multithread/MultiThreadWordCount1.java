@@ -28,30 +28,30 @@ public class MultiThreadWordCount1 {
         Map<String, Integer> resultMap = new HashMap<>();
         List<Map<String, Integer>> resultList = new ArrayList<>();
         resultList = Collections.synchronizedList(resultList);
-        for (int i=0;i<files.size();i++) {
+        for (int i = 0; i < files.size(); i++) {
             File file = files.get(i);
             List<Map<String, Integer>> finalResultList = resultList;
-            new Thread(()->{
+            new Thread(() -> {
                 Map<String, Integer> map = count(file);
                 finalResultList.add(map);
                 try {
                     lock.lock();
                     endNum.decrementAndGet();
                     condition.signal();
-                }finally {
+                } finally {
                     lock.unlock();
                 }
             }).start();
         }
         try {
             lock.lock();
-            while (endNum.get() > 0){
+            while (endNum.get() > 0) {
                 condition.await();
             }
-        }finally {
+        } finally {
             lock.unlock();
         }
-        for(Map<String, Integer> map : resultList){
+        for (Map<String, Integer> map : resultList) {
             resultMap = merge(resultMap, map);
         }
         System.out.println(resultMap);
