@@ -1,6 +1,5 @@
 package com.github.hcsp.multithread;
 
-import javax.sound.midi.Soundbank;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.*;
@@ -36,7 +35,7 @@ public class MultiThreadWordCount3 {
     static class WordCount extends RecursiveTask<Map<String, Integer>> {
         List<File> files;
 
-        public WordCount(List<File> files) {
+        WordCount(List<File> files) {
             this.files = files;
         }
 
