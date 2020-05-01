@@ -1,9 +1,6 @@
 package com.github.hcsp.multithread;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,13 +10,30 @@ import java.util.concurrent.*;
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws IOException, ExecutionException, InterruptedException {
-
+        ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         Map<String, Integer> finalResult = new HashMap<>();
-        for (File file : files) {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            List<Future<Map<String, Integer>>> futures = getFutures(threadNum, reader);
-            getFinalResult(finalResult, futures);
-        }
+        threadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                for (File file : files) {
+
+                    BufferedReader reader = null;
+                    try {
+                        reader = new BufferedReader(new FileReader(file));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    List<Future<Map<String, Integer>>> futures = getFutures(threadNum, reader);
+                    try {
+                        getFinalResult(finalResult, futures);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
         return finalResult;
     }
 
