@@ -13,9 +13,11 @@ public class MultiThreadWordCount3 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         Map<String, Integer> finalResult = new HashMap<>();
-        CountDownLatch latch = new CountDownLatch(threadNum);
         List<Map<String, Integer>> resultList = new ArrayList<>(files.size());
-        List<List<File>> threadFiles = Lists.partition(files, files.size() / threadNum);
+
+        List<List<File>> threadFiles = Lists.partition(files,
+                files.size() % threadNum == 0 ? files.size() / threadNum : files.size() / threadNum + 1);
+        CountDownLatch latch = new CountDownLatch(threadFiles.size());
         for (List<File> fileList : threadFiles) {
             new Thread(() -> {
                 for (File file : fileList) {

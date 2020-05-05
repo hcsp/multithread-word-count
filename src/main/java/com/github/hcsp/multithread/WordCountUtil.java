@@ -3,10 +3,8 @@ package com.github.hcsp.multithread;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Callable;
 
 /**
  * @author kwer
@@ -38,5 +36,27 @@ public class WordCountUtil {
             finalResult.put(word, map1.getOrDefault(word, 0) + map2.getOrDefault(word, 0));
         }
         return finalResult;
+    }
+   public static class WordCountTask implements Callable<List<Map<String, Integer>>> {
+        List<File> files;
+
+        public WordCountTask(List<File> files) {
+            this.files = files;
+        }
+
+        @Override
+        public List<Map<String, Integer>> call() throws Exception {
+            List<Map<String, Integer>> countResults = new ArrayList<>(files.size());
+            for (File file : files) {
+                System.out.println(Thread.currentThread().getName() + " 执行文件解析……");
+                countResults.add(WordCountUtil.count(file));
+            }
+            return countResults;
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(15%10);
+        System.out.println(100%10);
     }
 }
