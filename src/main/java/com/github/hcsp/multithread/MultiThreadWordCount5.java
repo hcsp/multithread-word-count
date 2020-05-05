@@ -1,7 +1,5 @@
 package com.github.hcsp.multithread;
 
-import com.google.common.collect.Lists;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -25,21 +23,21 @@ public class MultiThreadWordCount5 {
         return forkJoinTask.get();
     }
 
-static class WordCountTask extends RecursiveTask<Map<String, Integer>>{
-    List<File> files;
+    static class WordCountTask extends RecursiveTask<Map<String, Integer>> {
+        List<File> files;
 
-    public WordCountTask(List<File> files) {
-        this.files = files;
-    }
-
-    @Override
-    protected Map<String, Integer> compute() {
-        if (files.isEmpty()) {
-            return Collections.emptyMap();
+        public WordCountTask(List<File> files) {
+            this.files = files;
         }
-        Map<String, Integer> map1 = WordCountUtil.count(files.get(0));
-        Map<String, Integer> map2 = new WordCountTask(files.subList(1, files.size())).compute();
-        return WordCountUtil.merge(map1,map2);
+
+        @Override
+        protected Map<String, Integer> compute() {
+            if (files.isEmpty()) {
+                return Collections.emptyMap();
+            }
+            Map<String, Integer> map1 = WordCountUtil.count(files.get(0));
+            Map<String, Integer> map2 = new WordCountTask(files.subList(1, files.size())).compute();
+            return WordCountUtil.merge(map1, map2);
+        }
     }
-}
 }
