@@ -23,7 +23,7 @@ public class MultiThreadWordCount5 {
         return forkJoinTask.get();
     }
 
-    static class WordCountTask extends RecursiveTask<Map<String, Integer>> {
+   public static class WordCountTask extends RecursiveTask<Map<String, Integer>> {
         List<File> files;
 
         public WordCountTask(List<File> files) {
@@ -31,7 +31,7 @@ public class MultiThreadWordCount5 {
         }
 
         @Override
-        protected Map<String, Integer> compute() {
+        public Map<String, Integer> compute() {
             if (files.isEmpty()) {
                 return Collections.emptyMap();
             }
