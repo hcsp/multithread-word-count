@@ -12,15 +12,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量 Lock/Condition
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         List<File> files = Arrays.asList(new File("C:/Users/sunp/git/test-files/test1.txt"),
-                new File("C:/Users/sunp/git/test-files/test2.txt"),
-                new File("C:/Users/sunp/git/test-files/test3.txt"),
+                new File("C:/Users/sunp/git/test-files/test2.txt"), new File("C:/Users/sunp/git/test-files/test3.txt"),
                 new File("C:/Users/sunp/git/test-files/test4.txt"));
         System.out.println(count(4, files));
     }
 
-    public static Map<String, Integer> count(int threadNum, List<File> files) throws IOException, InterruptedException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws Exception {
         final Object lock = new Object();
         AtomicInteger chucksCount = new AtomicInteger(0);
         List<List<File>> fileChucks = MultiThreadWordUtility.fileSplit(threadNum, files);
@@ -28,23 +27,22 @@ public class MultiThreadWordCount1 {
         List<Map<String, Integer>> middleList = new ArrayList<>();
         for (List<File> fileChuck : fileChucks) {
             new Thread(() -> {
+                Map<String, Integer> middleResult = null;
+                try {
+                    middleResult = MultiThreadWordUtility.fileChuckCount(fileChuck);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 synchronized (lock) {
-                    while (chucksCount.get() == fileChucks.size()) {
+                    middleList.add(middleResult);
+                    while (chucksCount.addAndGet(1) == fileChucks.size()) {
                         lock.notify();
                     }
-                    try {                       
-                        Map<String, Integer> middleResult = MultiThreadWordUtility.fileChuckCount(fileChuck);
-                        middleList.add(middleResult);
-                        chucksCount.addAndGet(1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }                  
                 }
             }).start();
         }
-
         synchronized (lock) {
-            while (chucksCount.get() != fileChucks.size()) {
+            while (chucksCount.get() - 1 != fileChucks.size()) {
                 try {
                     lock.wait();
                 } catch (InterruptedException e) {

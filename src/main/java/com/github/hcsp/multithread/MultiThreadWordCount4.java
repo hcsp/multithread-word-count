@@ -1,9 +1,7 @@
 package com.github.hcsp.multithread;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,46 +13,39 @@ public class MultiThreadWordCount4 {
 
     // 使用threadNum个线程，并发统计文件中各单词的数量 feature and thread pool
 
-    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
-        List<File> files = Arrays.asList(new File("c:/users/sunp/git/multithread-word-count/target/test.txt"),
-                new File("c:/users/sunp/git/multithread-word-count/target/test2.txt"));
-        System.out.println(count(10, files));
+    public static void main(String[] args) throws Exception {
+        List<File> files = Arrays.asList(new File("C:/Users/sunp/git/test-files/test1.txt"),
+                new File("C:/Users/sunp/git/test-files/test2.txt"), new File("C:/Users/sunp/git/test-files/test3.txt"),
+                new File("C:/Users/sunp/git/test-files/test4.txt"));
+        System.out.println(count(4, files));
     }
 
     public static Map<String, Integer> count(int threadNum, List<File> files)
             throws IOException, InterruptedException, ExecutionException {
         Map<String, Integer> result = new HashMap<>();
-        for (File file : files) {
-            List<Map<String, Integer>> middleList = new ArrayList<>();
-            ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
-            BufferedReader bReader = Files.newBufferedReader(file.toPath());
-            for (int i = 0; i < threadNum; i++) {
+        List<Future<Map<String, Integer>>> middleList = new ArrayList<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
+        List<List<File>> fileChucks = MultiThreadWordUtility.fileSplit(threadNum, files);
+        for (List<File> fileChuck : fileChucks) {
             Future<Map<String, Integer>> future = executorService.submit(new Callable<Map<String, Integer>>() {
                 @Override
                 public Map<String, Integer> call() throws Exception {
                     try {
-                        Map<String, Integer> middleResult = new HashMap<>();
-                        String line;
-                        while (null != (line = bReader.readLine())) {
-                            String[] strings = line.split(" ");
-                            for (String word : strings) {
-                                middleResult.put(word, middleResult.getOrDefault(word, 0) + 1);
-                            }
-                        }
-                        return middleResult;
+                        return MultiThreadWordUtility.fileChuckCount(fileChuck);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 }
             });
-            middleList.add(future.get());
-            }
-            for (Map<String, Integer> stringIntegerMap : middleList) {
-                stringIntegerMap.forEach((key, value) -> {
-                    result.put(key, result.getOrDefault(key, 0) + value);
-                });
-            }
+            middleList.add(future);
         }
+
+        for (Future<Map<String, Integer>> stringIntegerMap : middleList) {
+            stringIntegerMap.get().forEach((key, value) -> {
+                result.put(key, result.getOrDefault(key, 0) + value);
+            });
+        }
+
         return result;
     }
 }
