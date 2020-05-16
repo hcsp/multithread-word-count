@@ -1,10 +1,8 @@
 package com.github.hcsp.multithread;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -22,24 +20,16 @@ public class MultiThreadWordCount1 {
     }
 
     private static Map<String, Integer> parseFutureFileContents(List<Future<Map<String, Integer>>> futures) {
-        Map<String, Integer> result = new HashMap<>();
+        List<Map<String, Integer>> mapList = new ArrayList<>();
         for (Future<Map<String, Integer>> future : futures) {
             try {
                 Map<String, Integer> singleFileResult = future.get();
-                for (Map.Entry<String, Integer> entry : singleFileResult.entrySet()) {
-                    String word = entry.getKey();
-                    Integer wordShowCount = entry.getValue();
-                    if (result.containsKey(word)) {
-                        result.put(word, result.get(word) + wordShowCount);
-                        continue;
-                    }
-                    result.put(word, wordShowCount);
-                }
+                mapList.add(singleFileResult);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
-        return result;
+        return WordCountUtils.mergeMap(mapList);
     }
 
     public static Future<Map<String, Integer>> readFileWithThreadPool(File file, ExecutorService executorService) {
@@ -54,19 +44,8 @@ public class MultiThreadWordCount1 {
         }
 
         @Override
-        public Map<String, Integer> call() throws Exception {
-            Map<String, Integer> result = new HashMap<>();
-            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    String[] words = line.split(" ");
-                    for (String word : words) {
-                        result.put(word, result.getOrDefault(word, 0) + 1);
-                    }
-                }
-                return result;
-            }
-
+        public Map<String, Integer> call() throws IOException {
+            return WordCountUtils.statisticsFileWordCount(file);
         }
     }
 }
