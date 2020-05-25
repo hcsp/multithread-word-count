@@ -1,12 +1,18 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
@@ -38,15 +44,4 @@ public class MultiThreadWordCount1 {
         }
         return finalResult;
     }
-
-//    public static void main(String[] args) throws ExecutionException, InterruptedException, FileNotFoundException {
-//        List<File> files = new ArrayList<>();
-//        files.add(new File("G:\\learningJava\\multithread-word-count\\word.txt"));
-//        files.add(new File("G:\\learningJava\\multithread-word-count\\word1.txt"));
-//        Map<String, Integer> map = count(2, files);
-//        for (Map.Entry<String, Integer> entry : map.entrySet()) {
-//            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-//        }
-//
-//    }
 }

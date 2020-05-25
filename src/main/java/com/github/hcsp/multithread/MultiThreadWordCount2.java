@@ -3,8 +3,8 @@ package com.github.hcsp.multithread;
 
 import com.google.common.collect.Lists;
 
-import java.io.*;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ public class MultiThreadWordCount2 {
 
     static Lock lock = new ReentrantLock();
 
-    public static Map<String, Integer> count(int threadNum, List<File> files) throws IOException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) {
         Map<String, Integer> wordCount = new ConcurrentHashMap<>();
         List<List<File>> fileGroup = Lists.partition(files, threadNum);
         AtomicInteger fileCount = new AtomicInteger(files.size());
