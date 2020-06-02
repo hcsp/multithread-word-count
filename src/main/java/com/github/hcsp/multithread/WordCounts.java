@@ -9,7 +9,7 @@ import java.util.Map;
 
 class WordCounts {
 
-    private static final Object lock = new Object();
+    private static final Object LOCK = new Object();
 
     /**
      * 将subResult合并到result中
@@ -20,7 +20,7 @@ class WordCounts {
 
     public static void mergeSubResult2Result(Map<String, Integer> subResult, Map<String, Integer> result) {
         for (Map.Entry<String, Integer> entry : subResult.entrySet()) {
-            synchronized (lock) {
+            synchronized (LOCK) {
                 result.put(entry.getKey(), result.getOrDefault(entry.getKey(), 0) + entry.getValue());
             }
         }
