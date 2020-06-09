@@ -56,7 +56,7 @@ public class MultiThreadWordCount1 {
 
     private BufferedReader reader;
 
-    public WorkerJob(BufferedReader reader) {
+    WorkerJob(BufferedReader reader) {
       this.reader = reader;
     }
 
