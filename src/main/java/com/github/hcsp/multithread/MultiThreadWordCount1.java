@@ -26,9 +26,9 @@ public class MultiThreadWordCount1 {
   }
 
   public Map<String, Integer> count(File file)
-      throws FileNotFoundException,  ExecutionException,  InterruptedException {
+      throws FileNotFoundException, ExecutionException, InterruptedException {
     BufferedReader reader = new BufferedReader(new FileReader(file));
-    List<Future<Map<String,Integer>>> futures = new ArrayList<>();
+    List<Future<Map<String, Integer>>> futures = new ArrayList<>();
     for (int i = 0; i < threadNum; ++i) {
       futures.add(threadPool.submit(new WorkerJob(reader)));
     }
