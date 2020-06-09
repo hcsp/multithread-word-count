@@ -34,26 +34,28 @@ public class MultiThreadWordCount1 {
     }
 
     Map<String, Integer> finalResult = new HashMap<>();
-    for (Future<Map<String, Integer>> future:futures) {
+    for (Future<Map<String, Integer>> future : futures) {
       Map<String, Integer> resultFromWorker = future.get();
-      mergeWorkerResultIntoFinaResult(resultFromWorker,finalResult);
+      mergeWorkerResultIntoFinaResult(resultFromWorker, finalResult);
     }
     return finalResult;
   }
 
   private void mergeWorkerResultIntoFinaResult(Map<String, Integer> resultFromWorker,
-                                               Map<String, Integer> finalResult) {
-    for (Map.Entry<String, Integer> entry:resultFromWorker.entrySet()) {
+      Map<String, Integer> finalResult) {
+    for (Map.Entry<String, Integer> entry : resultFromWorker.entrySet()) {
       String word = entry.getKey();
-      int mergedResult = finalResult.getOrDefault(word,0)+entry.getValue();
-      finalResult.put(word,mergedResult);
+      int mergedResult = finalResult.getOrDefault(word, 0) + entry.getValue();
+      finalResult.put(word, mergedResult);
     }
 
   }
 
 
-  static class WorkerJob implements Callable<Map<String,Integer>>{
+  static class WorkerJob implements Callable<Map<String, Integer>> {
+
     private BufferedReader reader;
+
     public WorkerJob(BufferedReader reader) {
       this.reader = reader;
     }
@@ -64,7 +66,7 @@ public class MultiThreadWordCount1 {
       Map<String, Integer> result = new HashMap<>();
       while ((line = reader.readLine()) != null) {
         String[] words = line.split(" ");
-        for (String word: words) {
+        for (String word : words) {
           result.put(word, result.getOrDefault(word, 0) + 1);
               /*if(result.containsKey(word)){
                 result.put(word,result.get(word)+1);
