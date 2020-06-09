@@ -26,15 +26,15 @@ public class MultiThreadWordCount1 {
   }
 
   public Map<String, Integer> count(File file)
-      throws FileNotFoundException, ExecutionException, InterruptedException {
+      throws FileNotFoundException,  ExecutionException,  InterruptedException {
     BufferedReader reader = new BufferedReader(new FileReader(file));
     List<Future<Map<String,Integer>>> futures = new ArrayList<>();
     for (int i = 0; i < threadNum; ++i) {
       futures.add(threadPool.submit(new WorkerJob(reader)));
     }
 
-    Map<String,Integer> finalResult =new HashMap<>();
-    for (Future<Map<String,Integer>> future:futures){
+    Map<String, Integer> finalResult = new HashMap<>();
+    for (Future<Map<String, Integer>> future:futures) {
       Map<String, Integer> resultFromWorker = future.get();
       mergeWorkerResultIntoFinaResult(resultFromWorker,finalResult);
     }
@@ -43,7 +43,7 @@ public class MultiThreadWordCount1 {
 
   private void mergeWorkerResultIntoFinaResult(Map<String, Integer> resultFromWorker,
                                                Map<String, Integer> finalResult) {
-    for (Map.Entry<String,Integer> entry:resultFromWorker.entrySet()){
+    for (Map.Entry<String, Integer> entry:resultFromWorker.entrySet()) {
       String word = entry.getKey();
       int mergedResult = finalResult.getOrDefault(word,0)+entry.getValue();
       finalResult.put(word,mergedResult);
@@ -64,8 +64,8 @@ public class MultiThreadWordCount1 {
       Map<String, Integer> result = new HashMap<>();
       while ((line = reader.readLine()) != null) {
         String[] words = line.split(" ");
-        for(String word: words){
-          result.put(word,result.getOrDefault(word,0)+1);
+        for (String word: words) {
+          result.put(word, result.getOrDefault(word, 0) + 1);
               /*if(result.containsKey(word)){
                 result.put(word,result.get(word)+1);
               }else {
