@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
-public class MultiThreadWordCount1 {
-    static final Object lock = new Object();
+public class MultiThreadWordCount6 {
+    static final ReentrantLock lock = new ReentrantLock();
+    static Condition condition = lock.newCondition();
 
     public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {
         Map<String, Integer> count = new ConcurrentHashMap<>();
@@ -16,19 +19,26 @@ public class MultiThreadWordCount1 {
         for (File file : files) {
             new Thread(() -> {
                 Map<String, Integer> map = GetWordInFile.getWordCountFormFile(file);
-                synchronized (lock) {
+                try {
+                    lock.lock();
                     GetWordInFile.mapAdd(count, map);
                     if (restFileNumber.decrementAndGet() == 0) {
-                        lock.notify();
+                        condition.signalAll();
                     }
+                } finally {
+                    lock.unlock();
                 }
             }).start();
         }
-        synchronized (lock) {
+        try {
+            lock.lock();
             while (restFileNumber.intValue() > 0) {
-                lock.wait();
+                condition.await();
             }
+        } finally {
+            lock.unlock();
         }
+
         System.out.println("time" + (System.currentTimeMillis() - t0));
         return count;
     }
