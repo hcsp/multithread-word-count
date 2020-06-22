@@ -12,15 +12,15 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * Future与线程池
+ */
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
         ExecutorService executors = Executors.newFixedThreadPool(threadNum);
         List<Future<?>> results = new ArrayList<>();
-        for (File file : files) {
-            Future<?> future = executors.submit((Callable<Object>) () -> wordCount(file));
-            results.add(future);
-        }
+        files.forEach(file -> results.add(executors.submit((Callable<Object>) () -> wordCount(file))));
 
         Map<String, Integer> allResult = new ConcurrentHashMap<>();
         for (Future<?> future : results) {
@@ -36,7 +36,7 @@ public class MultiThreadWordCount1 {
         return allResult;
     }
 
-    private static Map<String, Long> wordCount(File file) {
+    public static Map<String, Long> wordCount(File file) {
         try (Stream<String> lines = Files.lines(Paths.get(file.getAbsolutePath()), Charset.defaultCharset())) {
             return lines.flatMap(i -> Arrays.stream(i.split(" ")))
                     .map(String::toLowerCase)
@@ -48,7 +48,7 @@ public class MultiThreadWordCount1 {
     }
 
     public static void main(String[] args) throws Exception {
-        count(10, Arrays.asList(
+        MultiThreadWordCount2.count(10, Arrays.asList(
                 new File("C:/Users/Geass/AppData/Local/Temp/tmp1304366037002665857"),
                 new File("C:/Users/Geass/AppData/Local/Temp/tmp129166811928310870")
         ));
