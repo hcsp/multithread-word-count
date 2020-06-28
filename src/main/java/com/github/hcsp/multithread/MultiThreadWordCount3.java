@@ -25,17 +25,11 @@ public class MultiThreadWordCount3 {
      */
     private static Map<String, Integer> result = new ConcurrentHashMap<>();
 
-    private static AtomicInteger queue = new AtomicInteger();
-
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {
         ExecutorService executors = Executors.newFixedThreadPool(threadNum);
-        //协调main执行wait()方法的时机
-        CountDownLatch latch = new CountDownLatch(1);
+        AtomicInteger queue = new AtomicInteger(files.size());
         files.forEach(file -> executors.submit(() -> {
-            //线程开始时队列+1
-            queue.addAndGet(1);
-            latch.countDown();
             Map<String, Long> threadResult = MultiThreadWordCount2.getThreadCountMap(file);
             synchronized (result) {
                 //合并线程Map与主线程Map到一个临时Map
@@ -52,9 +46,8 @@ public class MultiThreadWordCount3 {
             }
         }));
         //等待子线程开始执行
-        latch.await();
         synchronized (result) {
-            while (queue.get() != 0) {
+            while (queue.get() > 0) {
                 //如果队列不为0则继续等待
                 result.wait();
             }
