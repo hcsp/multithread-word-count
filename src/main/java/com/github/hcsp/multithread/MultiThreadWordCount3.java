@@ -1,15 +1,65 @@
 package com.github.hcsp.multithread;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.counting;
 
 /**
  * Object.wait/notify
  */
 public class MultiThreadWordCount3 {
+    /**
+     * 用于收集各个线程的结果
+     */
+    private static Map<String, Integer> result = new ConcurrentHashMap<>();
+
+    private static AtomicInteger queue = new AtomicInteger();
+
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    public static Map<String, Integer> count(int threadNum, List<File> files) {
-        return null;
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {
+        ExecutorService executors = Executors.newFixedThreadPool(threadNum);
+        //协调main执行wait()方法的时机
+        CountDownLatch latch = new CountDownLatch(1);
+        files.forEach(file -> executors.submit(() -> {
+            //线程开始时队列+1
+            queue.addAndGet(1);
+            latch.countDown();
+            Map<String, Long> threadResult = MultiThreadWordCount2.getThreadCountMap(file);
+            synchronized (result) {
+                //合并线程Map与主线程Map到一个临时Map
+                Map<String, Integer> collect = Stream.of(result, threadResult)
+                        .flatMap(map -> map.entrySet().stream())
+                        .collect(Collectors.toConcurrentMap(Map.Entry::getKey,
+                                value -> Integer.valueOf(String.valueOf(value.getValue())),
+                                Integer::sum));
+                //将临时Map覆盖到主线程Map中
+                result.putAll(collect);
+                //线程结束时队列-1
+                queue.addAndGet(-1);
+                result.notify();
+            }
+        }));
+        //等待子线程开始执行
+        latch.await();
+        synchronized (result) {
+            while (queue.get() != 0) {
+                //如果队列不为0则继续等待
+                result.wait();
+            }
+        }
+        executors.shutdown();
+        return result;
     }
 }

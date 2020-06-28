@@ -48,7 +48,7 @@ public class MultiThreadWordCount1 {
     }
 
     public static void main(String[] args) throws Exception {
-        MultiThreadWordCount2.count(10, Arrays.asList(
+        MultiThreadWordCount4.count(10, Arrays.asList(
                 new File("C:/Users/Geass/AppData/Local/Temp/tmp1304366037002665857"),
                 new File("C:/Users/Geass/AppData/Local/Temp/tmp129166811928310870")
         ));
