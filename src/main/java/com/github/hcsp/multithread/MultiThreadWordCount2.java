@@ -33,7 +33,7 @@ public class MultiThreadWordCount2 {
         BufferedReader reader;
         Map<String, Integer> result;
 
-        public CountWord(BufferedReader reader, ConcurrentHashMap<String, Integer> result) {
+        CountWord(BufferedReader reader, ConcurrentHashMap<String, Integer> result) {
             this.reader = reader;
             this.result = result;
         }
