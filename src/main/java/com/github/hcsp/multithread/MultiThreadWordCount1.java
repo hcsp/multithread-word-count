@@ -31,7 +31,6 @@ public class MultiThreadWordCount1 {
                             value -> Integer.valueOf(String.valueOf(value.getValue())),
                             Integer::sum));
         }
-        System.out.println(allResult);
         executors.shutdown();
         return allResult;
     }
@@ -48,7 +47,7 @@ public class MultiThreadWordCount1 {
     }
 
     public static void main(String[] args) throws Exception {
-        MultiThreadWordCount5.count(10, Arrays.asList(
+        MultiThreadWordCount6.count(10, Arrays.asList(
                 new File("C:/Users/Geass/AppData/Local/Temp/tmp1304366037002665857"),
                 new File("C:/Users/Geass/AppData/Local/Temp/tmp129166811928310870")
         ));
