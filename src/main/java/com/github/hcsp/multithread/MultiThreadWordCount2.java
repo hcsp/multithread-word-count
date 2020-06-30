@@ -21,7 +21,7 @@ public class MultiThreadWordCount2 {
     /**
      * 用于收集各个线程的结果
      */
-    private static Map<String, Integer> result = new ConcurrentHashMap<>();
+    private static final Map<String, Integer> result = new ConcurrentHashMap<>();
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {

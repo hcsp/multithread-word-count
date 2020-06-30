@@ -13,11 +13,11 @@ import java.util.stream.Stream;
  */
 public class MultiThreadWordCount6 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    public static Map<String, Integer> count(int threadNum, List<File> files) {
-        List<Map<String, Long>> resultArray = new ArrayList();
+    public static Map<String, Integer> countFail(int threadNum, List<File> files) {
+        List<Map<String, Long>> resultArray = new ArrayList<>();
         files.parallelStream().forEach(file -> resultArray.add(MultiThreadWordCount2.getThreadCountMap(file)));
         Map<String, Integer> allResult = new ConcurrentHashMap<>();
-        //合并线程Map结果
+        //合并线程Map结果,本方式存在线程安全隐患,应该改为"7"的reduce
         for (Map<String, Long> tempResult : resultArray) {
             allResult = Stream.of(allResult, tempResult)
                     .flatMap(map -> map.entrySet().stream())
