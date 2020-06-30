@@ -24,8 +24,8 @@ public class MultiThreadWordCount4 {
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {
-        Lock lock = new ReentrantLock();//~=synchronized
-        Condition condition = lock.newCondition();//~=Object.wait/notify
+        Lock lock = new ReentrantLock(); //~=synchronized
+        Condition condition = lock.newCondition(); //~=Object.wait/notify
         AtomicInteger queue = new AtomicInteger(files.size());
         ExecutorService executors = Executors.newFixedThreadPool(threadNum);
         files.forEach(file -> executors.submit(() -> {

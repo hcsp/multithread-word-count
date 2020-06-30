@@ -1,16 +1,19 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * Future与线程池
@@ -46,7 +49,7 @@ public class MultiThreadWordCount1 {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         MultiThreadWordCount7.count(10, Arrays.asList(
                 new File("C:/Users/Geass/AppData/Local/Temp/tmp1304366037002665857"),
                 new File("C:/Users/Geass/AppData/Local/Temp/tmp129166811928310870")
