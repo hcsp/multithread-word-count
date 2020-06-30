@@ -4,33 +4,27 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * ForkJoinPool
+ * parallelStream()
  */
-public class MultiThreadWordCount5 {
+public class MultiThreadWordCount6 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
-        ForkJoinPool forkJoinPool = new ForkJoinPool();
-        List<Future<?>> futures = new ArrayList<>();
-        files.forEach(file ->
-                futures.add(forkJoinPool.submit(() ->
-                        MultiThreadWordCount2.getThreadCountMap(file))));
-
-        //合并线程Map与主线程Map到一个临时Map
+    public static Map<String, Integer> countFail(int threadNum, List<File> files) {
+        List<Map<String, Long>> resultArray = new ArrayList<>();
+        files.parallelStream().forEach(file -> resultArray.add(MultiThreadWordCount2.getThreadCountMap(file)));
         Map<String, Integer> allResult = new ConcurrentHashMap<>();
-        for (Future<?> future : futures) {
-            Map<String, Integer> tempResult = (Map<String, Integer>) future.get();
+        //合并线程Map结果,本方式存在线程安全隐患,应该改为"7"的reduce
+        for (Map<String, Long> tempResult : resultArray) {
             allResult = Stream.of(allResult, tempResult)
                     .flatMap(map -> map.entrySet().stream())
                     .collect(Collectors.toMap(Map.Entry::getKey,
                             value -> Integer.valueOf(String.valueOf(value.getValue())),
                             Integer::sum));
         }
-        forkJoinPool.shutdown();
         return allResult;
     }
 }
