@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.counting;
 
+/**
+ * future和线程池
+ */
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) {
