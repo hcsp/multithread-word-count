@@ -20,14 +20,14 @@ public class MultiThreadWordCount1 {
         long keepAliveTime = 10;
         TimeUnit unit = TimeUnit.SECONDS;
         BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>(files.size());
-        ThreadPoolExecutor pool = new ThreadPoolExecutor( corePoolSize,
-                                                             maximumPoolSize,
-                                                             keepAliveTime,
-                                                             unit,
-                                                             workQueue);
+        ThreadPoolExecutor pool = new ThreadPoolExecutor(corePoolSize,
+                maximumPoolSize,
+                keepAliveTime,
+                unit,
+                workQueue);
         List<Future> futureList = new ArrayList<>();
         files.forEach(file -> {
-            futureList.add(pool.submit(()->wordCount(file)));
+            futureList.add(pool.submit(() -> wordCount(file)));
         });
 
         Map<String, Integer> result = new ConcurrentHashMap<>();
@@ -35,9 +35,9 @@ public class MultiThreadWordCount1 {
         for (Future future : futureList) {
             try {
                 Map<String, Long> map = (Map<String, Long>) future.get();
-                Set<String> keys =  map.keySet();
-                for (String key :keys) {
-                    result.put(key , result.getOrDefault(key , 0) + map.getOrDefault(key, 0L).intValue());
+                Set<String> keys = map.keySet();
+                for (String key : keys) {
+                    result.put(key, result.getOrDefault(key, 0) + map.getOrDefault(key, 0L).intValue());
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -50,12 +50,12 @@ public class MultiThreadWordCount1 {
         return result;
     }
 
-    static Map<String, Long> wordCount(File file){
+    static Map<String, Long> wordCount(File file) {
 
         try {
             List<String> list = Files.readAllLines(file.toPath());
-            return list.parallelStream().flatMap(i-> Arrays.stream(i.split(" ")))
-                                .collect(Collectors.groupingBy(key -> key, counting()));
+            return list.parallelStream().flatMap(i -> Arrays.stream(i.split(" ")))
+                    .collect(Collectors.groupingBy(key -> key, counting()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,7 +64,7 @@ public class MultiThreadWordCount1 {
     }
 
     public static void main(String[] args) {
-        System.out.println(count(1,Arrays.asList(
+        System.out.println(count(1, Arrays.asList(
                 new File("1.txt"),
                 new File("2.txt"),
                 new File("3.txt"),
