@@ -10,9 +10,7 @@ import java.util.Map;
 
 public class Utils {
 
-    /**
-     * 合并map
-     */
+
     public static Map<String, Integer> mergeMap(Map<String, Integer> targetMap, Map<String, Integer> finalResult) {
         for (Map.Entry<String, Integer> entry : targetMap.entrySet()) {
             finalResult.put(entry.getKey(), finalResult.getOrDefault(entry.getKey(), 0) + entry.getValue());
@@ -20,9 +18,7 @@ public class Utils {
         return finalResult;
     }
 
-    /**
-     * 合并list与map
-     */
+
     public static Map<String, Integer> mergeMapList(List<Map<String, Integer>> mapList) {
         Map<String, Integer> result = new HashMap<>();
         for (Map<String, Integer> oneMap : mapList) {
@@ -34,9 +30,7 @@ public class Utils {
     }
 
 
-    /**
-     * 统计一个文件的单词个数
-     */
+
     public static Map<String, Integer> countFile(File file) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
         Map<String, Integer> countResult = new HashMap<>();
