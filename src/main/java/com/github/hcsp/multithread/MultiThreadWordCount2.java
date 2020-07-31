@@ -1,8 +1,97 @@
 package com.github.hcsp.multithread;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class MultiThreadWordCount2 {
+    private static final Map<String, Integer> finalMap = new LinkedHashMap<>();
+    private static boolean finishRead = false;
+    private static final Lock lock = new ReentrantLock();
+    private static final Condition isFinishedYet = lock.newCondition();
+    private static final Condition isStillReading = lock.newCondition();
+
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    //    public static Map<String, Integer> count(int threadNum, List<File> files) {
-    //        return null;
-    //    }
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws IOException, InterruptedException {
+        ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
+        List<BufferedReader> readers = getReaders(files);
+
+        for (int i = 0; i < threadNum; i++) {
+            threadPool.execute(new CountWord(readers));
+        }
+
+        lock.lock();
+        try {
+            while (!finishRead) {
+                isFinishedYet.await();
+            }
+        } finally {
+            lock.unlock();
+        }
+
+        threadPool.shutdown();
+        return finalMap;
+    }
+
+    public static class CountWord extends Thread {
+        private final List<BufferedReader> readers;
+
+        public CountWord(List<BufferedReader> readers) {
+            this.readers = readers;
+        }
+
+        @Override
+        public void run() {
+            lock.lock();
+            try {
+                String s;
+                while (!finishRead && (s = getReadLine(readers)) != null) {
+                    for (String word : s.split(" ")) {
+                        if (!"".equals(word)) {
+                            finalMap.put(word, finalMap.getOrDefault(word, 0) + 1);
+                        }
+                    }
+                }
+                isFinishedYet.signal();
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
+    private static List<BufferedReader> getReaders(List<File> files) throws FileNotFoundException {
+        List<BufferedReader> readers = new ArrayList<>(files.size());
+        for (File file : files) {
+            readers.add(new BufferedReader(new FileReader(file)));
+        }
+        return readers;
+    }
+
+    private static String getReadLine(List<BufferedReader> readers) {
+        try {
+            if (!finishRead) {
+                for (BufferedReader bReader : readers) {
+                    String line;
+                    if ((line = bReader.readLine()) != null) {
+                        return line;
+                    }
+                }
+                finishRead = true;
+                for (BufferedReader bReader : readers) {
+                    bReader.close();
+                }
+            }
+            return null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("IOException when BufferedReader readLine!");
+        }
+    }
 }
