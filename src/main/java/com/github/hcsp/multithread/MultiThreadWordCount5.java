@@ -1,6 +1,9 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,7 +35,7 @@ public class MultiThreadWordCount5 {
     public static class WordsInFile extends RecursiveTask<Map<String, Integer>> {
         private static final int THRESHOLD = 20;
         private int countLine = 0;
-        private final BufferedReader reader;
+        private BufferedReader reader;
 
         public WordsInFile(BufferedReader reader) {
             this.reader = reader;

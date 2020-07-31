@@ -1,6 +1,10 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,22 +13,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MultiThreadWordCount1 {
-    private static final Map<String, Integer> finalMap = new LinkedHashMap<>();
+    private static Map<String, Integer> finalMap = new LinkedHashMap<>();
+    private static final Object LOCK = new Object();
     private static boolean finishRead = false;
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws IOException, InterruptedException {
         ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         List<BufferedReader> readers = getReaders(files);
-        final Object lock = new Object();
 
         for (int i = 0; i < threadNum; i++) {
-            threadPool.execute(new CountWord(readers, lock));
+            threadPool.execute(new CountWord(readers));
         }
 
-        synchronized (lock) {
+        synchronized (LOCK) {
             while (!finishRead) {
-                lock.wait();
+                LOCK.wait();
             }
         }
 
@@ -42,17 +46,15 @@ public class MultiThreadWordCount1 {
     }
 
     public static class CountWord extends Thread {
-        private final List<BufferedReader> readers;
-        private final Object lock;
+        private List<BufferedReader> readers;
 
-        public CountWord(List<BufferedReader> readers, Object lock) {
+        public CountWord(List<BufferedReader> readers) {
             this.readers = readers;
-            this.lock = lock;
         }
 
         @Override
         public void run() {
-            synchronized (lock) {
+            synchronized (LOCK) {
                 String s;
                 while (!finishRead && (s = getReadLine(readers)) != null) {
                     for (String word : s.split(" ")) {
@@ -61,7 +63,7 @@ public class MultiThreadWordCount1 {
                         }
                     }
                 }
-                lock.notify();
+                LOCK.notify();
             }
         }
     }

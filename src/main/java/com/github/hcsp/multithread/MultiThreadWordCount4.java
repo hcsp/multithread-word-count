@@ -1,11 +1,18 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
 
 public class MultiThreadWordCount4 {
     // (Future/threadPool) 使用threadNum个线程，并发统计文件中各单词的数量
@@ -24,14 +31,14 @@ public class MultiThreadWordCount4 {
     }
 
     private static class CountWord implements Callable<Map<String, Integer>> {
-        private final List<BufferedReader> readers;
+        private List<BufferedReader> readers;
 
         private CountWord(List<BufferedReader> readers) {
             this.readers = readers;
         }
 
         @Override
-        public Map<String, Integer> call() throws Exception {
+        public Map<String, Integer> call() {
             String s;
             Map<String, Integer> map = new LinkedHashMap<>();
             while ((s = getReadLine(readers)) != null) {
@@ -61,7 +68,7 @@ public class MultiThreadWordCount4 {
         return finalMap;
     }
 
-    private static List<BufferedReader> getReaders(List<File> files) throws FileNotFoundException {
+    private static List<BufferedReader> getReaders(List<File> files) throws IOException {
         List<BufferedReader> readers = new ArrayList<>(files.size());
         for (File file : files) {
             readers.add(new BufferedReader(new FileReader(file)));

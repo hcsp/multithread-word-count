@@ -1,6 +1,9 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -8,13 +11,13 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 public class MultiThreadWordCount3 {
-    private static final Map<String, Integer> finalMap = new LinkedHashMap<>();
+    private static Map<String, Integer> finalMap = new LinkedHashMap<>();
 
     // (CountDownLatch) 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws IOException, InterruptedException {
         CountDownLatch latch = new CountDownLatch(threadNum);
         List<BufferedReader> readers = getReaders(files);
-        final Object lock = new Object();
+        Object lock = new Object();
 
         for (int i = 0; i < threadNum; i++) {
             new CountWord(readers, latch, lock).start();
@@ -24,7 +27,7 @@ public class MultiThreadWordCount3 {
         return finalMap;
     }
 
-    private static List<BufferedReader> getReaders(List<File> files) throws FileNotFoundException {
+    private static List<BufferedReader> getReaders(List<File> files) throws IOException {
         List<BufferedReader> readers = new ArrayList<>(files.size());
         for (File file : files) {
             readers.add(new BufferedReader(new FileReader(file)));
@@ -33,19 +36,19 @@ public class MultiThreadWordCount3 {
     }
 
     public static class CountWord extends Thread {
-        private final List<BufferedReader> readers;
-        private final CountDownLatch latch;
-        private final Object lock;
+        private List<BufferedReader> readers;
+        private CountDownLatch latch;
+        private final Object LOCK;
 
         public CountWord(List<BufferedReader> readers, CountDownLatch latch, Object lock) {
             this.readers = readers;
             this.latch = latch;
-            this.lock = lock;
+            this.LOCK = lock;
         }
 
         @Override
         public void run() {
-            synchronized (lock) {
+            synchronized (LOCK) {
                 try {
                     String s;
                     while ((s = getReadLine(readers)) != null) {

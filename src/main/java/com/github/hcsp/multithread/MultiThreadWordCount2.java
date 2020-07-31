@@ -1,6 +1,10 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,14 +16,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MultiThreadWordCount2 {
-    private static final Map<String, Integer> finalMap = new LinkedHashMap<>();
+    private static Map<String, Integer> finalMap = new LinkedHashMap<>();
     private static boolean finishRead = false;
-    private static final Lock lock = new ReentrantLock();
-    private static final Condition isFinishedYet = lock.newCondition();
-    private static final Condition isStillReading = lock.newCondition();
+    private static Lock lock = new ReentrantLock();
+    private static Condition isFinishedYet = lock.newCondition();
+//    private static Condition isStillReading = lock.newCondition();
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    public static Map<String, Integer> count(int threadNum, List<File> files) throws IOException, InterruptedException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, InterruptedException {
         ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         List<BufferedReader> readers = getReaders(files);
 
@@ -41,7 +45,7 @@ public class MultiThreadWordCount2 {
     }
 
     public static class CountWord extends Thread {
-        private final List<BufferedReader> readers;
+        private List<BufferedReader> readers;
 
         public CountWord(List<BufferedReader> readers) {
             this.readers = readers;
