@@ -40,11 +40,11 @@ public class MultiThreadWordCount3 {
     static class WorkCountTask3 extends WorkCountTask {
         private CountDownLatch countDownLatch;
 
-        public WorkCountTask3(File file) {
+        WorkCountTask3(File file) {
             super(file);
         }
 
-        public WorkCountTask3(File file, CountDownLatch countDownLatch) {
+        WorkCountTask3(File file, CountDownLatch countDownLatch) {
             super(file);
             this.countDownLatch = countDownLatch;
         }

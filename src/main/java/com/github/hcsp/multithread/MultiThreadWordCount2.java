@@ -51,7 +51,7 @@ public class MultiThreadWordCount2 {
     static class WorkCountConsumer<T> {
         private LinkedBlockingQueue<Future<T>> queue;
 
-        public WorkCountConsumer(LinkedBlockingQueue<Future<T>> queue) {
+        WorkCountConsumer(LinkedBlockingQueue<Future<T>> queue) {
             this.queue = queue;
         }
 
@@ -72,7 +72,7 @@ public class MultiThreadWordCount2 {
         }
     }
 
-    static enum PoisonPill implements Future<Object> {
+    enum PoisonPill implements Future<Object> {
         INSTANCE;
 
         @Override

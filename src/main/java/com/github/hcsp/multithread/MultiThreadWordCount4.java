@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ public class MultiThreadWordCount4 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         final CyclicBarrier barrier = new CyclicBarrier(threadNum + 1);
-        Map<String, Integer> result = new HashMap<>();
+        Map<String, Integer> result = new ConcurrentHashMap<>();
         for (File file : files) {
             new Thread(() -> {
                 FileReader fileReader = null;
@@ -44,6 +45,8 @@ public class MultiThreadWordCount4 {
                 }
             }).start();
         }
+
+
         try {
             barrier.await();
         } catch (InterruptedException e) {
