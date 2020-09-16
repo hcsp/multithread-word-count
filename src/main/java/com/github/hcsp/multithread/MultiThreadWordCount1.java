@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class MultiThreadWordCount1 {
-    private static ExecutorService EXECUTOR_SERVICE;
+    private static ExecutorService executorService;
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) {
@@ -23,7 +23,7 @@ public class MultiThreadWordCount1 {
         // 多线程执行
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         for (File file : files) {
-            futures.add(EXECUTOR_SERVICE.submit(new WorkCountTask(file)));
+            futures.add(executorService.submit(new WorkCountTask(file)));
         }
 
         // 获取每个线程的结果并合并
@@ -46,7 +46,7 @@ public class MultiThreadWordCount1 {
     }
 
     private static void init(int threadNum) {
-        EXECUTOR_SERVICE = new ThreadPoolExecutor(threadNum, threadNum,
+        executorService = new ThreadPoolExecutor(threadNum, threadNum,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(2900));
     }

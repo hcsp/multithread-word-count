@@ -18,7 +18,7 @@ public class MultiThreadWordCount3 {
         ExecutorService executor = Executors.newFixedThreadPool(5);
         List<Future<Map<String, Integer>>> futureList = new ArrayList<>(threadNum);
         for (File file : files) {
-            futureList.add(executor.submit(new WorkCountTask3(file,countDownLatch)));
+            futureList.add(executor.submit(new WorkCountTask3(file, countDownLatch)));
         }
 
 
@@ -39,6 +39,7 @@ public class MultiThreadWordCount3 {
 
     static class WorkCountTask3 extends WorkCountTask {
         private CountDownLatch countDownLatch;
+
         public WorkCountTask3(File file) {
             super(file);
         }
