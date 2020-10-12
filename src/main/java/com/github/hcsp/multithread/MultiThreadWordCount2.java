@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  **/
 
 public class MultiThreadWordCount2 {
-    static final Map<String, Integer> reduce = new ConcurrentHashMap<>(16);
+    static final Map<String, Integer> REDUCE = new ConcurrentHashMap<>(16);
 
     static ThreadPoolExecutor executorService;
 
@@ -50,9 +50,9 @@ public class MultiThreadWordCount2 {
         }
         for (Future<Map<String, Integer>> future : futures) {
             Map<String, Integer> countMap = future.get();
-            countMap.forEach((word, count) -> reduce.merge(word, count, (a, b) -> a + b));
+            countMap.forEach((word, count) -> REDUCE.merge(word, count, (a, b) -> a + b));
         }
-        return reduce;
+        return REDUCE;
     }
 
     public static class Executor implements Callable<Map<String, Integer>> {
