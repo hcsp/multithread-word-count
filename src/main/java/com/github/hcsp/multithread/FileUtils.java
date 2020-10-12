@@ -29,7 +29,7 @@ public class FileUtils {
      * @author gxz
      * @param file 文件
      * @param num 共分成多少份
-     *
+     * @return 返回被分成的份数集合
      **/
     public static List<List<String>> getFileLines(File file, int num) {
         List<String> lines = readLines(file);

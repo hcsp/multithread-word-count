@@ -23,7 +23,7 @@ public class MultiThreadWordCount5 {
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException,
-            InterruptedException, BrokenBarrierException {
+            InterruptedException {
 
         Map<String, Integer> result = new HashMap<>();
 
