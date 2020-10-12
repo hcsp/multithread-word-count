@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  **/
 
 public class MultiThreadWordCount3 {
-    static final Map<String, Integer> reduce = new ConcurrentHashMap<>(16);
+    static final Map<String, Integer> REDUCE = new ConcurrentHashMap<>(16);
 
     static ThreadPoolExecutor executorService;
 
@@ -51,7 +51,7 @@ public class MultiThreadWordCount3 {
             executorService.execute(new Executor(box));
         }
         cyclicBarrier.await();
-        return reduce;
+        return REDUCE;
     }
 
 
@@ -71,8 +71,8 @@ public class MultiThreadWordCount3 {
                     .map(FileUtils::splitLineToWords)  //分词
                     .flatMap(Collection::stream)
                     .collect(Collectors.groupingBy(x -> x, Collectors.summingInt(x -> 1))); // 计算数量
-            synchronized (reduce) {
-                countMap.forEach((word, count) -> reduce.merge(word, count, (a, b) -> b + a));
+            synchronized (REDUCE) {
+                countMap.forEach((word, count) -> REDUCE.merge(word, count, (a, b) -> b + a));
             }
             try {
                 cyclicBarrier.await();
