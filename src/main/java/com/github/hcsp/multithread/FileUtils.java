@@ -3,7 +3,8 @@ package com.github.hcsp.multithread;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,11 +53,11 @@ public class FileUtils {
      * @return 分词之后的集合
      **/
     public static List<String> splitLineToWords(String line) {
-        line = line.trim();
+        String lineTrim = line.trim();
         List<String> words = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < line.length(); i++) {
-            char c = line.charAt(i);
+        for (int i = 0; i < lineTrim.length(); i++) {
+            char c = lineTrim.charAt(i);
             if (c != ' ') {
                 stringBuilder.append(c);
             } else {

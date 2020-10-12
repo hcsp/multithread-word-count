@@ -4,9 +4,13 @@ package com.github.hcsp.multithread;
 import com.google.common.collect.Lists;
 
 import java.io.File;
-import java.security.Policy;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveTask;
 import java.util.stream.Collectors;
 
 /****
@@ -19,7 +23,7 @@ public class MultiThreadWordCount1 {
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException,
-            InterruptedException, BrokenBarrierException {
+            InterruptedException {
         // 所有的行
         List<String> allLines = files.stream().map(FileUtils::readLines)
                 .flatMap(Collection::stream)
