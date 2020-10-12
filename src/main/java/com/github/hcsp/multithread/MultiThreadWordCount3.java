@@ -1,18 +1,11 @@
 package com.github.hcsp.multithread;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
-import sun.plugin2.gluegen.runtime.CPU;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 /****
@@ -20,22 +13,20 @@ import java.util.stream.Collectors;
  * 每个线程统计自己的数量 (在每个线程中合并  这次用读写锁操作)
  * 使用Runnable
  *
- * 使用 CyclicBarrier实现唤醒(没必要 但也能实现)
+ * 使用 CyclicBarrier实现唤醒  (当所有线程都汇总到reduce中 唤醒主线程)
  **/
 
 public class MultiThreadWordCount3 {
-    static final Map<String, AtomicInteger> reduce = new ConcurrentHashMap<>(16);
+    static final Map<String, Integer> reduce = new ConcurrentHashMap<>(16);
 
     static ThreadPoolExecutor executorService;
 
-    static  CyclicBarrier cyclicBarrier;
-
-    static ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    static CyclicBarrier cyclicBarrier;
 
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException,
-            InterruptedException {
+            InterruptedException, BrokenBarrierException {
         executorService = new ThreadPoolExecutor(
                 threadNum,
                 threadNum,
@@ -44,19 +35,13 @@ public class MultiThreadWordCount3 {
                 new ArrayBlockingQueue<>(1024),
                 Executors.defaultThreadFactory(),
                 new ThreadPoolExecutor.AbortPolicy());
-        List<List<File>> fileBox = Lists.partition(files, threadNum);
+        // 这里偷懒一下  平均分成10份
+        List<List<File>> fileBox = Lists.partition(files, 1);
+        cyclicBarrier = new CyclicBarrier(fileBox.size() + 1);
         for (List<File> box : fileBox) {
-            Future<Map<String, Long>> submit = executorService.submit(new Executor(box));
-            Map<String, Long> countMap = submit.get();
-            countMap.forEach((word,count)->{
-                if(reduce.containsKey(word)){
-                    reduce.put(word,(int)(reduce.get(word)+count));
-                }else{
-                    reduce.put(word,(int)(count+0)); // 这里为了强转  一定不会出现超过int的情况
-                }
-            });
+            executorService.execute(new Executor(box));
         }
-
+        cyclicBarrier.await();
         return reduce;
     }
 
@@ -70,25 +55,21 @@ public class MultiThreadWordCount3 {
 
         @Override
         public void run() {
-            Map<String, Long> countMap = files.stream()
+            Map<String, Integer> countMap = files.stream()
                     .map(FileUtils::readLines)
                     .filter(Objects::nonNull) // 切割成多行
                     .flatMap(Collection::stream)   // 每行独立
                     .map(FileUtils::splitLineToWords)  //分词
                     .flatMap(Collection::stream)
-                    .collect(Collectors.groupingBy(x -> x, Collectors.counting()));// 计算数量
-            countMap.forEach((word,count)->{
-                if(reduce.containsKey(word)){
-                    reduce.get(word).addAndGet((int)(count+0));
-                }else{
-                    reduce.put(word,new AtomicInteger());
-                }
-            });
+                    .collect(Collectors.groupingBy(x -> x, Collectors.summingInt(x -> 1)));// 计算数量
+            synchronized (reduce) {
+                countMap.forEach((word, count) -> {
+                    reduce.merge(word, count, (a, b) -> b + a);
+                });
+            }
             try {
                 cyclicBarrier.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (BrokenBarrierException e) {
+            } catch (InterruptedException | BrokenBarrierException e) {
                 e.printStackTrace();
             }
         }

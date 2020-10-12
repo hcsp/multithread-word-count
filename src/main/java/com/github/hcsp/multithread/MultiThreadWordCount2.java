@@ -1,17 +1,10 @@
 package com.github.hcsp.multithread;
 
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
-import sun.plugin2.gluegen.runtime.CPU;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.LongAdder;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /****
@@ -40,25 +33,18 @@ public class MultiThreadWordCount2 {
                 new ThreadPoolExecutor.AbortPolicy());
         // 这里参数写1 就是平均分成10份 其实是偷懒写法。。 应该用算法计算每个线程的工作数
         List<List<File>> fileBox = Lists.partition(files, 1);
-        List<Future<Map<String, Long>>> futures = new ArrayList<>();
+        List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         for (List<File> box : fileBox) {
             futures.add(executorService.submit(new Executor(box)));
         }
-        for (Future<Map<String, Long>> future : futures) {
-            Map<String, Long> countMap = future.get();
-            countMap.forEach((word,count)->{
-                if(reduce.containsKey(word)){
-                    reduce.put(word,(int)(reduce.get(word)+count));
-                }else{
-                    reduce.put(word,(int)(count+0)); // 这里为了强转  一定不会出现超过int的情况
-                }
-            });
+        for (Future<Map<String, Integer>> future : futures) {
+            Map<String, Integer> countMap = future.get();
+            countMap.forEach((word, count) -> reduce.merge(word, count, (a, b) -> a + b));
         }
-
         return reduce;
     }
 
-    public static class Executor implements Callable<Map<String, Long>> {
+    public static class Executor implements Callable<Map<String, Integer>> {
         final List<File> files;
 
         public Executor(List<File> files) {
@@ -66,18 +52,15 @@ public class MultiThreadWordCount2 {
         }
 
         @Override
-        public Map<String, Long> call() throws Exception {
+        public Map<String, Integer> call() throws Exception {
             return files.stream()
                     .map(FileUtils::readLines)
                     .filter(Objects::nonNull) // 切割成多行
                     .flatMap(Collection::stream)   // 每行独立
                     .map(FileUtils::splitLineToWords)  //分词
                     .flatMap(Collection::stream)
-                    .collect(Collectors.groupingBy(x -> x, Collectors.counting()));// 计算数量
+                    .collect(Collectors.groupingBy(x -> x, Collectors.summingInt(x -> 1)));// 计算数量
         }
-
-
-
 
 
     }

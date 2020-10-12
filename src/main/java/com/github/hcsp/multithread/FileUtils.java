@@ -33,7 +33,7 @@ public class FileUtils {
     public static List<List<String>> getFileLines(File file, int num) {
         List<String> lines = readLines(file);
         // 这里偷懒了一下 如果不能整除的话是会有数据丢失的  因为我发现都是10个文件和10个线程。 就先这么写。。不是重点
-        return Lists.partition(lines, lines.size()/num);
+        return Lists.partition(lines, lines.size() / num);
     }
 
     public static List<String> readLines(File file) {

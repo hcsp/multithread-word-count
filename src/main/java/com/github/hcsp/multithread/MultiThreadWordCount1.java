@@ -1,95 +1,66 @@
 package com.github.hcsp.multithread;
 
-import sun.plugin2.gluegen.runtime.CPU;
+
+import com.google.common.collect.Lists;
 
 import java.io.File;
+import java.security.Policy;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.LongAdder;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /****
- * 一个一个文件处理，
- * 每个线程执行相应行的操作
- * 使用Runnable无返回值形式
- * 共享集合 添加时用lock锁
- *
- * 主线程用CountDownLatch等待
+ * forkJoin实现
  **/
 
 public class MultiThreadWordCount1 {
-    static final Map<String, Integer> reduce = new ConcurrentHashMap<>(16);
 
-    static ThreadPoolExecutor executorService;
-
-    static CountDownLatch countDownLatch;
-
-    static Lock lock = new ReentrantLock();
-
+    static int threshold;
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    public static Map<String, Integer> count(int threadNum, List<File> files) {
-        executorService = new ThreadPoolExecutor(
-                threadNum,
-                threadNum,
-                10,
-                TimeUnit.MINUTES,
-                new ArrayBlockingQueue<>(1024),
-                Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.AbortPolicy());
-        // 把一个文件分成10份
-        final int count = 10;
-        List<List<String>> lines = files.stream().map((file) -> FileUtils.getFileLines(file, count))
-                .filter(Objects::nonNull)
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException,
+            InterruptedException, BrokenBarrierException {
+        // 所有的行
+        List<String> allLines = files.stream().map(FileUtils::readLines)
+                .flatMap(Collection::stream)
+                .map(FileUtils::splitLineToWords)
                 .flatMap(Collection::stream).collect(Collectors.toList());
-        countDownLatch = new CountDownLatch(lines.size());
-        lines.forEach(fileLines -> executorService.execute(new Executor(fileLines)));
-        try {
-            countDownLatch.await();
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return reduce;
+        // 阈值随便设置一个
+        threshold = allLines.size() / threadNum;
+        ForkJoinPool pool = new ForkJoinPool();
+        ForkJoinTask<Map<String, Integer>> task = new ForkJoinExecutor(allLines);
+        pool.invoke(task);
+        return task.get();
     }
 
 
-    public static class Executor implements Runnable {
-        final List<String> lines;
+    public static class ForkJoinExecutor extends RecursiveTask<Map<String, Integer>> {
+        List<String> lines;
 
-        public Executor(List<String> lines) {
+        ForkJoinExecutor(List<String> lines) {
             this.lines = lines;
         }
 
         @Override
-        public void run() {
-            for (String line : this.lines) {
-                analysis(line);
+        protected Map<String, Integer> compute() {
+            if (lines.size() < threshold) {
+                return lines.stream().collect(Collectors.groupingBy(x -> x, Collectors.summingInt(x -> 1)));
+            } else {
+                List<List<String>> partition = Lists.partition(lines, lines.size() / 2 + 1);
+                // 这里一定会切割出两个
+                ForkJoinExecutor pre = new ForkJoinExecutor(partition.get(0));
+                pre.fork();
+                ForkJoinExecutor next = new ForkJoinExecutor(partition.get(1));
+                next.fork();
+                Map<String, Integer> preJoin = pre.join();
+                Map<String, Integer> nextJoin = next.join();
+                preJoin.forEach((word, count) -> nextJoin.merge(word, count, (a, b) -> a + b));
+                return nextJoin;
             }
-            countDownLatch.countDown();
         }
-
-        private void analysis(String line) {
-            List<String> words = FileUtils.splitLineToWords(line);
-            lock.lock();
-            try {
-                for (String word : words) {
-                    if (reduce.containsKey(word)) {
-                        reduce.put(word, reduce.get(word) + 1);
-                    } else {
-                        reduce.put(word, 1);
-                    }
-                }
-            } finally {
-                lock.unlock();
-            }
-
-        }
-
 
     }
-
 }
+
+
+
