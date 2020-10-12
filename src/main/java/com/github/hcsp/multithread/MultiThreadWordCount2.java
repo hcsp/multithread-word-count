@@ -70,7 +70,7 @@ public class MultiThreadWordCount2 {
                     .flatMap(Collection::stream)   // 每行独立
                     .map(FileUtils::splitLineToWords)  //分词
                     .flatMap(Collection::stream)
-                    .collect(Collectors.groupingBy(x -> x, Collectors.summingInt(x -> 1)));// 计算数量
+                    .collect(Collectors.groupingBy(x -> x, Collectors.summingInt(x -> 1))); // 计算数量
         }
 
 
