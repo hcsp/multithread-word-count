@@ -72,9 +72,7 @@ public class MultiThreadWordCount3 {
                     .flatMap(Collection::stream)
                     .collect(Collectors.groupingBy(x -> x, Collectors.summingInt(x -> 1)));// 计算数量
             synchronized (reduce) {
-                countMap.forEach((word, count) -> {
-                    reduce.merge(word, count, (a, b) -> b + a);
-                });
+                countMap.forEach((word, count) -> reduce.merge(word, count, (a, b) -> b + a));
             }
             try {
                 cyclicBarrier.await();

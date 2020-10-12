@@ -27,7 +27,7 @@ public class MultiThreadWordCount4 {
 
     static List<String> list = new CopyOnWriteArrayList<>();
 
-    static final Queue<String> queue = new ConcurrentLinkedQueue<>();
+    static final Queue<String> QUEUE = new ConcurrentLinkedQueue<>();
 
     static ThreadPoolExecutor executorService;
 
@@ -49,7 +49,7 @@ public class MultiThreadWordCount4 {
                 .flatMap(Collection::stream)
                 .map(FileUtils::splitLineToWords)
                 .flatMap(Collection::stream)
-                .forEach(queue::offer);
+                .forEach(QUEUE::offer);
 
         countDownLatch = new CountDownLatch(threadNum);
         for (int i = 0; i < threadNum; i++) {
@@ -64,7 +64,7 @@ public class MultiThreadWordCount4 {
         @Override
         public void run() {
             while (true) {
-                String word = queue.poll();
+                String word = QUEUE.poll();
                 if (word == null) {
                     countDownLatch.countDown();
                     break;

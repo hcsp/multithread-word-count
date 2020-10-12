@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  **/
 
 public class MultiThreadWordCount6 {
-    static final Map<String, Integer> reduce = new ConcurrentHashMap<>(16);
+    static final Map<String, Integer> REDUCE = new ConcurrentHashMap<>(16);
 
     static ThreadPoolExecutor executorService;
 
@@ -46,7 +46,7 @@ public class MultiThreadWordCount6 {
                 new ThreadPoolExecutor.AbortPolicy());
         // 把一个文件分成10份
         final int count = 10;
-        List<List<String>> lines = files.stream().map((file) -> FileUtils.getFileLines(file, count))
+        List<List<String>> lines = files.stream().map(file -> FileUtils.getFileLines(file, count))
                 .flatMap(Collection::stream).collect(Collectors.toList());
         countDownLatch = new CountDownLatch(lines.size());
         lines.forEach(fileLines -> executorService.execute(new Executor(fileLines)));
@@ -56,7 +56,7 @@ public class MultiThreadWordCount6 {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return reduce;
+        return REDUCE;
     }
 
 
@@ -80,10 +80,10 @@ public class MultiThreadWordCount6 {
             lock.lock();
             try {
                 for (String word : words) {
-                    if (reduce.containsKey(word)) {
-                        reduce.put(word, reduce.get(word) + 1);
+                    if (REDUCE.containsKey(word)) {
+                        REDUCE.put(word, REDUCE.get(word) + 1);
                     } else {
-                        reduce.put(word, 1);
+                        REDUCE.put(word, 1);
                     }
                 }
             } finally {
