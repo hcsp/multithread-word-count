@@ -53,7 +53,7 @@ public class MultiThreadWordCount1 {
     static class ComputeFileWord implements Callable<Map<String, Integer>> {
         private final BufferedReader bufferedReader;
 
-        public ComputeFileWord(BufferedReader bufferedReader) {
+        ComputeFileWord(BufferedReader bufferedReader) {
             this.bufferedReader = bufferedReader;
         }
 
