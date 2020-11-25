@@ -1,6 +1,10 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +34,9 @@ public class MultiThreadWordCount2 {
                             result.put(word, result.getOrDefault(word, 0) + 1);
                         }
                         units.add(result);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
-                    } finally {
+                    }  finally {
                         lock.readLock().unlock();
                     }
                 }
