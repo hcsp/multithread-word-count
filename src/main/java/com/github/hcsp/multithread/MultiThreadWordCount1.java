@@ -58,19 +58,5 @@ public class MultiThreadWordCount1 {
             return fileWords;
         }
     }
-
-    public static void main(String[] args) throws FileNotFoundException, ExecutionException, InterruptedException {
-        List<File> files = new ArrayList<>();
-        files.add(new File("D:\\project\\multithread-word-count\\src\\main\\java\\com\\github\\hcsp\\multithread\\1.txt"));
-        files.add(new File("D:\\project\\multithread-word-count\\src\\main\\java\\com\\github\\hcsp\\multithread\\2.txt"));
-        files.add(new File("D:\\project\\multithread-word-count\\src\\main\\java\\com\\github\\hcsp\\multithread\\3.txt"));
-        files.add(new File("D:\\project\\multithread-word-count\\src\\main\\java\\com\\github\\hcsp\\multithread\\4.txt"));
-        files.add(new File("D:\\project\\multithread-word-count\\src\\main\\java\\com\\github\\hcsp\\multithread\\5.txt"));
-        files.add(new File("D:\\project\\multithread-word-count\\src\\main\\java\\com\\github\\hcsp\\multithread\\6.txt"));
-        Map<String, Integer> results = MultiThreadWordCount1.count(5, files);
-        for (Map.Entry<String, Integer> resultEntry : results.entrySet()) {
-            System.out.println("Key: " + resultEntry.getKey()+"    Value: " + resultEntry.getValue());
-        }
-    }
 }
 
