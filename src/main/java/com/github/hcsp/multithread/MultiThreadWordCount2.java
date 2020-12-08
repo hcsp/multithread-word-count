@@ -15,11 +15,12 @@ public class MultiThreadWordCount2 {
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         ForkJoinPool forkJoinPool = new ForkJoinPool(threadNum);
         ForkJoinTask<Map<String, Integer>> task = new readFileWordTask(files);
-        return forkJoinPool.invoke(task);
+        Map<String, Integer> taskResults = forkJoinPool.invoke(task);
+        return taskResults;
     }
 
     public static class readFileWordTask extends RecursiveTask<Map<String, Integer>> {
-        private static final int THRESHOLD = 5;
+        private static final int THRESHOLD = 3;
         List<File> files;
 
         public readFileWordTask(List<File> files) {
@@ -28,12 +29,11 @@ public class MultiThreadWordCount2 {
 
         @Override
         protected Map<String, Integer> compute() {
-            Map<String, Integer> results = null;
-            if (files.size() < THRESHOLD) {
+            if (files.size() <= 6) {
+                Map<String, Integer> results = new ConcurrentHashMap<>();
                 for (File file : files) {
                     try {
                         BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-                        results = new ConcurrentHashMap<>();
                         String line;
                         while ((line = bufferedReader.readLine()) != null) {
                             String[] words = line.split(" ");
@@ -41,11 +41,12 @@ public class MultiThreadWordCount2 {
                                 results.put(word, results.getOrDefault(word, 0) + 1);
                             }
                         }
-                        System.out.println(file.getCanonicalFile());
+                        // System.out.println(file.getCanonicalFile());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
+                return results;
             } else {
                 List<File> subFiles1 = files.subList(0, files.size() / 2);
                 List<File> subFiles2 = files.subList(files.size() / 2, files.size());
@@ -54,22 +55,22 @@ public class MultiThreadWordCount2 {
                 invokeAll(subTask1, subTask2);
                 Map<String, Integer> subResult1 = subTask1.join();
                 Map<String, Integer> subResult2 = subTask2.join();
-                results = mergeTwoMap(subResult1, subResult2);
+                return mergeTwoMap(subResult1, subResult2);
             }
-            return results;
         }
 
         private Map<String, Integer> mergeTwoMap(Map<String, Integer> subResult1, Map<String, Integer> subResult2) {
-            Map<String, Integer> results = new ConcurrentHashMap<>(subResult1);
-            for (Map.Entry<String, Integer> stringIntegerEntry : subResult2.entrySet()) {
+            Map<String, Integer> results = new ConcurrentHashMap<>(subResult2);
+            for (Map.Entry<String, Integer> stringIntegerEntry : subResult1.entrySet()) {
                 String word = stringIntegerEntry.getKey();
-                results.put(word, subResult2.getOrDefault(word, 0) + 1);
+                int countNum = results.getOrDefault(word, 0) + stringIntegerEntry.getValue();
+                results.put(word, countNum);
             }
             return results;
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         List<File> files = new ArrayList<>();
         files.add(new File("D:\\project\\multithread-word-count\\src\\main\\java\\com\\github\\hcsp\\multithread\\1.txt"));
         files.add(new File("D:\\project\\multithread-word-count\\src\\main\\java\\com\\github\\hcsp\\multithread\\2.txt"));
