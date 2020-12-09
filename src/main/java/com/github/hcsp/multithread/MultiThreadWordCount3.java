@@ -1,19 +1,13 @@
 package com.github.hcsp.multithread;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class MultiThreadWordCount3 {
@@ -63,10 +57,13 @@ public class MultiThreadWordCount3 {
             String line = null;
             while (true) {
                 try {
-                    if ((line = bufferedReader.readLine()) == null) break;
+                    if ((line = bufferedReader.readLine()) == null) {
+                        break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                assert line != null;
                 String[] words = line.split(" ");
                 for (String word : words) {
                     fileResults.put(word, fileResults.getOrDefault(word, 0) + 1);

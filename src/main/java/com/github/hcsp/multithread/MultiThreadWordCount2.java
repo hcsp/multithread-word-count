@@ -1,7 +1,9 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,8 +17,7 @@ public class MultiThreadWordCount2 {
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         ForkJoinPool forkJoinPool = new ForkJoinPool(threadNum);
         ForkJoinTask<Map<String, Integer>> task = new readFileWordTask(files);
-        Map<String, Integer> taskResults = forkJoinPool.invoke(task);
-        return taskResults;
+        return forkJoinPool.invoke(task);
     }
 
     public static class readFileWordTask extends RecursiveTask<Map<String, Integer>> {
@@ -29,7 +30,7 @@ public class MultiThreadWordCount2 {
 
         @Override
         protected Map<String, Integer> compute() {
-            if (files.size() <= 6) {
+            if (files.size() <= THRESHOLD) {
                 Map<String, Integer> results = new ConcurrentHashMap<>();
                 for (File file : files) {
                     try {
