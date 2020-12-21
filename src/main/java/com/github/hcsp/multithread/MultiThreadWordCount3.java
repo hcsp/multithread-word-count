@@ -5,4 +5,5 @@ public class MultiThreadWordCount3 {
     //    public static Map<String, Integer> count(int threadNum, List<File> files) {
     //        return null;
     //    }
+
 }
