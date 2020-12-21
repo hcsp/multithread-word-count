@@ -35,8 +35,7 @@ public class MultiThreadWordCount2 {
 
         for (int i = 0; i < threadNum; i++) {
             BufferedReader finalReader = reader;
-            Callable callable = () -> CountTools.lineToMap(finalReader);
-            futures.add(threadPool.submit(callable));
+            futures.add(threadPool.submit(() -> CountTools.lineToMap(finalReader)));
         }
 
         for (Future<Map<String, Integer>> future : futures) {
@@ -46,10 +45,10 @@ public class MultiThreadWordCount2 {
         return CountTools.MapListReduce(maps);
     }
 
-    public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
-        File directory = new File("D:\\temp");
-        List<File> files = Arrays.asList(directory.listFiles());
-        System.out.println(count(10, files));
-        System.out.println();
-    }
+//    public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
+//        File directory = new File("D:\\temp");
+//        List<File> files = Arrays.asList(directory.listFiles());
+//        System.out.println(count(10, files));
+//        System.out.println();
+//    }
 }
