@@ -18,7 +18,7 @@ public class CountTools {
         while ((line = reader.readLine()) != null) {
             mapList.add(lineToMap(line));
         }
-        return MapListReduce(mapList);
+        return mapListReduce(mapList);
     }
 
     public static Map<String, Integer> lineToMap(String line) {
@@ -33,7 +33,7 @@ public class CountTools {
         return map;
     }
 
-    public static Map<String, Integer> MapListReduce(List<Map<String, Integer>> mapList) {
+    public static Map<String, Integer> mapListReduce(List<Map<String, Integer>> mapList) {
         Map<String, Integer> result = new HashMap<>();
         for (Map<String, Integer> map : mapList) {
             map.forEach((k, v) -> result.merge(k, v, Integer::sum));

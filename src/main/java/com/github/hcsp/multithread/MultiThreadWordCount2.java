@@ -5,10 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -23,7 +21,7 @@ public class MultiThreadWordCount2 {
         for (File file : files) {
             maps.add(count2.fileCount(threadNum, file));
         }
-        return CountTools.MapListReduce(maps);
+        return CountTools.mapListReduce(maps);
     }
 
     private Map<String, Integer> fileCount(int threadNum, File file) throws IOException, ExecutionException, InterruptedException {
@@ -42,7 +40,7 @@ public class MultiThreadWordCount2 {
             maps.add(future.get());
         }
         threadPool.shutdown();
-        return CountTools.MapListReduce(maps);
+        return CountTools.mapListReduce(maps);
     }
 
 //    public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
