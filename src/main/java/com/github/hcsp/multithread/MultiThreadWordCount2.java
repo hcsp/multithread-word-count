@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -34,23 +33,23 @@ public class MultiThreadWordCount2 {
         ArrayList<Future<Map<String, Integer>>> futures = new ArrayList<>();
         ExecutorService threadPool = newFixedThreadPool(threadNum);
 
-        String line;
-        while ((line = reader.readLine()) != null) {
-            String finalLine = line;
-            Callable<Map<String, Integer>> callable = () -> CountTools.lineToMap(finalLine);
+        for (int i = 0; i < threadNum; i++) {
+            BufferedReader finalReader = reader;
+            Callable callable = () -> CountTools.lineToMap(finalReader);
             futures.add(threadPool.submit(callable));
         }
 
         for (Future<Map<String, Integer>> future : futures) {
             maps.add(future.get());
         }
-        System.out.println(file.getName());
+        threadPool.shutdown();
         return CountTools.MapListReduce(maps);
     }
 
-//    public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
-//        File directory = new File("D:\\temp");
-//        List<File> files = Arrays.asList(directory.listFiles());
-//        System.out.println(count(10, files));
-//    }
+    public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
+        File directory = new File("D:\\temp");
+        List<File> files = Arrays.asList(directory.listFiles());
+        System.out.println(count(10, files));
+        System.out.println();
+    }
 }
