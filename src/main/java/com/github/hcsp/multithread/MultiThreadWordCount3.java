@@ -39,12 +39,17 @@ public class MultiThreadWordCount3 {
             if (files.size() == 1) {
                 MultiThreadWordCount2.countOneFile(files.get(0));
             } else {
-                this.files.forEach(file -> {
-                    WordCounter wordCounter = new WordCounter(new ArrayList<File>(1) {{
-                        add(file);
-                    }});
-                    wordCounter.fork();
-                });
+                int middle = files.size() / 2;
+                List<File> list1 = files.subList(0, middle);
+                List<File> list2 = files.subList(middle, files.size());
+                new WordCounter(list1).fork();
+                new WordCounter(list2).fork();
+//                this.files.forEach(file -> {
+//                    WordCounter wordCounter = new WordCounter(new ArrayList<File>(1) {{
+//                        add(file);
+//                    }});
+//                    wordCounter.fork();
+//                });
             }
         }
     }
