@@ -68,6 +68,7 @@ public class MultiThreadWordCount1 {
      * 计算一个文件的单词个数
      *
      * @param file 文件
+     * @param latch l
      * @return 计数Map
      * @throws IOException e
      */

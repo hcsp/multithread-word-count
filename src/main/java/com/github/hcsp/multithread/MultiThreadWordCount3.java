@@ -1,7 +1,6 @@
 package com.github.hcsp.multithread;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
@@ -30,7 +29,7 @@ public class MultiThreadWordCount3 {
 
         private List<File> files;
 
-        public WordCounter(List<File> files) {
+        WordCounter(List<File> files) {
             this.files = files;
         }
 
