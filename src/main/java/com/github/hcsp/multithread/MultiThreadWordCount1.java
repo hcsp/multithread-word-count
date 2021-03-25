@@ -71,7 +71,7 @@ public class MultiThreadWordCount1 {
      * @return 计数Map
      * @throws IOException e
      */
-    private static Map<String, Integer> countOneFile(File file, CountDownLatch latch) throws IOException {
+    public static Map<String, Integer> countOneFile(File file, CountDownLatch latch) throws IOException {
         HashMap<String, Integer> countMap = new HashMap<>();
         BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
         String line;
