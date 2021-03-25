@@ -38,12 +38,16 @@ public class MultiThreadWordCount2 {
         latch.countDown();
     }
 
-    public static void countOneFile(File file) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            String[] s = line.split(" ");
-            Arrays.stream(s).forEach(MultiThreadWordCount2::add);
+    public static void countOneFile(File file) {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] s = line.split(" ");
+                Arrays.stream(s).forEach(MultiThreadWordCount2::add);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

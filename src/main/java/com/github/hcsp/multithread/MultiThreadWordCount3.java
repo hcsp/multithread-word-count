@@ -1,7 +1,6 @@
 package com.github.hcsp.multithread;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,11 +37,7 @@ public class MultiThreadWordCount3 {
         @Override
         protected void compute() {
             if (files.size() == 1) {
-                try {
-                    MultiThreadWordCount2.countOneFile(files.get(0));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                MultiThreadWordCount2.countOneFile(files.get(0));
             } else {
                 this.files.forEach(file -> {
                     WordCounter wordCounter = new WordCounter(new ArrayList<File>(1) {{
