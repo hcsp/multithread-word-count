@@ -11,16 +11,16 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MultiThreadWordCount1 {
-    private static final Map<String, Integer> countRes = new HashMap<>();
+    private static final Map<String, Integer> COUNT_RES = new HashMap<>();
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    private static final Object lock = new Object();
+    private static final Object LOCK = new Object();
 
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         AtomicInteger filesSize = new AtomicInteger(files.size());
         for (int i = 1; i <= threadNum; i++) {
             new Thread(() -> {
                 int fileIndex;
-                synchronized (lock) {
+                synchronized (LOCK) {
                     fileIndex = filesSize.decrementAndGet();
                 }
                 if (fileIndex >= 0) {
@@ -35,28 +35,28 @@ public class MultiThreadWordCount1 {
                     for (String line : lines) {
                         String[] words = line.split(" ");
                         for (String word : words) {
-                            synchronized (lock) {
-                                countRes.put(word, countRes.getOrDefault(word, 0) + 1);
+                            synchronized (LOCK) {
+                                COUNT_RES.put(word, COUNT_RES.getOrDefault(word, 0) + 1);
                             }
                         }
                     }
                 }
                 if (fileIndex == 0) {
-                    synchronized (lock) {
-                        lock.notify();
+                    synchronized (LOCK) {
+                        LOCK.notify();
                     }
                 }
             }).start();
         }
         if (filesSize.get() > 0) {
             try {
-                synchronized (lock) {
-                    lock.wait();
+                synchronized (LOCK) {
+                    LOCK.wait();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        return countRes;
+        return COUNT_RES;
     }
 }
