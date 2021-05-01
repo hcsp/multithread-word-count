@@ -7,10 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
-
-import static java.util.concurrent.Executors.newFixedThreadPool;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 
 public class MultiThreadWordCount5 {
     // 使用threadNum个线程，并发统计文件中各单词的数量

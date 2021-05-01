@@ -7,8 +7,6 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MultiThreadWordCount2 {
     private static Map<String, Integer> result = new HashMap<>();
@@ -54,7 +52,7 @@ public class MultiThreadWordCount2 {
                             e.printStackTrace();
                         }
                     }
-                    if(files.size() > 0){
+                    if (files.size() > 0) {
                         container.value = files.get(0);
                         files.remove(0);
                         container.notify();
