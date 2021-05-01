@@ -3,6 +3,7 @@ package com.github.hcsp.multithread;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws Exception {
         Map<String, Integer> map = new HashMap<>();
+        List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         ExecutorService threadPool = newFixedThreadPool(threadNum);
         for (File file : files) {
             if (!file.exists()) {
@@ -24,8 +26,12 @@ public class MultiThreadWordCount1 {
                 continue;
             }
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            Future<Map<String, Integer>> result = threadPool.submit(new Task(bufferedReader));
-            for (Map.Entry<String, Integer> entry : result.get().entrySet()) {
+            for (int i = 0; i < threadNum; i++) {
+                futures.add(threadPool.submit(new Task(bufferedReader)));
+            }
+        }
+        for (Future<Map<String, Integer>> future : futures) {
+            for (Map.Entry<String, Integer> entry : future.get().entrySet()) {
                 Integer num = map.getOrDefault(entry.getKey(), 0);
                 map.put(entry.getKey(), num + entry.getValue());
             }
@@ -53,7 +59,6 @@ public class MultiThreadWordCount1 {
                     countMap.put(word, num);
                 }
             }
-            bufferedReader.close();
             return countMap;
         }
     }
