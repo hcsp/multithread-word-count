@@ -19,7 +19,7 @@ public class MultiThreadWordCount1 {
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         ExecutorService threadPool = newFixedThreadPool(threadNum);
         for (File file : files) {
-            futures.add(threadPool.submit(countWord(file)));
+            futures.add(threadPool.submit((Callable<Map<String, Integer>>) () -> countWord(file)));
         }
         for (Future<Map<String, Integer>> future : futures) {
             for (Map.Entry<String, Integer> entry : future.get().entrySet()) {
@@ -31,24 +31,18 @@ public class MultiThreadWordCount1 {
         return map;
     }
 
-    private static Callable<Map<String, Integer>> countWord(File file) throws IOException {
-        Callable<Map<String, Integer>> callable = new Callable<Map<String, Integer>>() {
-            @Override
-            public Map<String, Integer> call() throws Exception {
-                Map<String, Integer> map = new HashMap<>();
-                List<String> contents = FileUtils.readFileContent(file);
-                for (String content : contents) {
-                    String[] words = content.split(" ");
-                    for (String word : words) {
-                        synchronized (MultiThreadWordCount1.class) {
-                            map.put(word, map.getOrDefault(word, 0) + 1);
-                        }
-                    }
+    private static Map<String, Integer> countWord(File file) throws IOException {
+        Map<String, Integer> map = new HashMap<>();
+        List<String> contents = FileUtils.readFileContent(file);
+        for (String content : contents) {
+            String[] words = content.split(" ");
+            for (String word : words) {
+                synchronized (MultiThreadWordCount1.class) {
+                    map.put(word, map.getOrDefault(word, 0) + 1);
                 }
-                return map;
             }
-        };
-        return callable;
+        }
+        return map;
     }
-
 }
+
