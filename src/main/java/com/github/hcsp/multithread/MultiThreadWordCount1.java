@@ -1,14 +1,12 @@
 package com.github.hcsp.multithread;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -21,8 +19,7 @@ public class MultiThreadWordCount1 {
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         ExecutorService threadPool = newFixedThreadPool(threadNum);
         for (File file : files) {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            futures.add(threadPool.submit(new Task(bufferedReader)));
+            futures.add(threadPool.submit(countWord(file)));
         }
         for (Future<Map<String, Integer>> future : futures) {
             for (Map.Entry<String, Integer> entry : future.get().entrySet()) {
@@ -34,24 +31,24 @@ public class MultiThreadWordCount1 {
         return map;
     }
 
-    static class Task implements Callable<Map<String, Integer>> {
-        private BufferedReader bufferedReader;
-
-        public Task(BufferedReader bufferedReader) {
-            this.bufferedReader = bufferedReader;
-        }
-
-        @Override
-        public Map<String, Integer> call() throws Exception {
-            String strLine = null;
-            Map<String, Integer> countMap = new ConcurrentHashMap<>();
-            while (null != (strLine = bufferedReader.readLine())) {
-                String[] words = strLine.split("\\s");
-                for (String word : words) {
-                    countMap.put(word, (countMap.getOrDefault(word, 0)+1));
+    private static Callable<Map<String, Integer>> countWord(File file) throws IOException {
+        Callable<Map<String, Integer>> callable = new Callable<Map<String, Integer>>() {
+            @Override
+            public Map<String, Integer> call() throws Exception {
+                Map<String, Integer> map = new HashMap<>();
+                List<String> contents = FileUtils.readFileContent(file);
+                for (String content : contents) {
+                    String[] words = content.split(" ");
+                    for (String word : words) {
+                        synchronized (MultiThreadWordCount1.class) {
+                            map.put(word, map.getOrDefault(word, 0) + 1);
+                        }
+                    }
                 }
+                return map;
             }
-            return countMap;
-        }
+        };
+        return callable;
     }
+
 }
