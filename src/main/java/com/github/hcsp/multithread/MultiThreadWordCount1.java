@@ -19,7 +19,7 @@ public class MultiThreadWordCount1 {
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         ExecutorService threadPool = newFixedThreadPool(threadNum);
         for (File file : files) {
-            futures.add(threadPool.submit((Callable<Map<String, Integer>>) () -> countWord(file)));
+            futures.add(threadPool.submit(new CallableImpl(file)));
         }
         for (Future<Map<String, Integer>> future : futures) {
             for (Map.Entry<String, Integer> entry : future.get().entrySet()) {
@@ -30,6 +30,20 @@ public class MultiThreadWordCount1 {
         threadPool.shutdown();
         return map;
     }
+
+    public static class CallableImpl implements Callable<Map<String, Integer>> {
+        private File file;
+
+        @Override
+        public Map<String, Integer> call() throws Exception {
+            return countWord(file);
+        }
+
+        public CallableImpl(File file) {
+            this.file = file;
+        }
+    }
+
 
     private static Map<String, Integer> countWord(File file) throws IOException {
         Map<String, Integer> map = new HashMap<>();
