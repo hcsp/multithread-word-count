@@ -1,11 +1,14 @@
 package com.github.hcsp.multithread;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.TimeUnit;
 
 public class MultiThreadWordCount5 {
     // 使用threadNum个线程，并发统计文件中各单词的数量

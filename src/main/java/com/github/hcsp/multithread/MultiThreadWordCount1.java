@@ -1,6 +1,6 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MultiThreadWordCount1 {
-    private static LinkedBlockingQueue<File> queue = new LinkedBlockingQueue<>();
+    private static final LinkedBlockingQueue<File> queue = new LinkedBlockingQueue<>();
 
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) throws InterruptedException {
