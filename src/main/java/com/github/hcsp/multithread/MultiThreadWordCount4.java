@@ -43,7 +43,7 @@ public class MultiThreadWordCount4 {
     static class WorkerJob implements Callable<Map<String, Integer>> {
         private final File file;
 
-        public WorkerJob(File file) {
+        WorkerJob(File file) {
             this.file = file;
         }
 
