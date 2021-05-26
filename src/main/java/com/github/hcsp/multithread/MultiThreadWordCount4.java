@@ -2,29 +2,24 @@ package com.github.hcsp.multithread;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class MultiThreadWordCount4 {
     //     使用threadNum个线程，并发统计文件中各单词的数量
-    public static Map<String, Integer> count(int threadNum, List<File> files) throws FileNotFoundException, ExecutionException, InterruptedException {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
         ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
         Map<String, Integer> finalResult = new HashMap<>();
-        for (int i = 0; i < threadNum; i++) {
-            for (File file : files) {
-                futures.add(threadPool.submit(new WorkerJob(file)));
-            }
+
+        for (File file : files) {
+            futures.add(threadPool.submit(new WorkerJob(file)));
         }
+
 
         for (Future<Map<String, Integer>> future : futures) {
             mergeWorkerResultIntoFileResult(future.get(), finalResult);
