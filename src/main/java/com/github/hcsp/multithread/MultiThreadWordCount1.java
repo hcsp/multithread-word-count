@@ -8,13 +8,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    public static Map<String, Integer> count(int threadNum, List<File> files) {
+    public static Map<String, Integer> count(int threadNum, List<File> files) throws ExecutionException, InterruptedException {
 
         ExecutorService threadPool = Executors.newFixedThreadPool(threadNum);
 
@@ -24,8 +25,12 @@ public class MultiThreadWordCount1 {
             futures.add(threadPool.submit(() -> workJob(file)));
         }
 
+        Map<String, Integer> finalResult = new HashMap<>();
+        for (Future<Map<String, Integer>> workResult : futures) {
+            mergeWorkResultIntoFileResult(workResult.get(), finalResult);
+        }
 
-        return null;
+        return finalResult;
     }
 
 
@@ -47,6 +52,13 @@ public class MultiThreadWordCount1 {
 
     private static Map<String, Integer> mergeWorkResultIntoFileResult(Map<String, Integer> workResult, Map<String, Integer> fileResult) {
 
-        return null;
+
+        for (Map.Entry<String, Integer> entrySet : workResult.entrySet()) {
+            String word = entrySet.getKey();
+            int mergerResult = fileResult.getOrDefault(word, 0) + entrySet.getValue();
+            fileResult.put(word, mergerResult);
+        }
+
+        return fileResult;
     }
 }
