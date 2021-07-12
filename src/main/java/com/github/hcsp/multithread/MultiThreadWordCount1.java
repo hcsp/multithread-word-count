@@ -9,30 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 public class MultiThreadWordCount1 extends Thread {
-    public static final Object LOCK = new Object();
     public static Map<String, Integer> resultMap = new HashMap<>();
 
     public static Map<String, Integer> count(int threadNum, List<File> files) {
-        int fileLength = files.size();
-        int threadExecuteFileNum = (int) Math.floor((double) fileLength / threadNum);
-
-        for (int i = 0; i < threadNum; ++i) {
-            int startIndex = i * threadExecuteFileNum;
-            int endIndex = i == threadNum - 1 ? fileLength : (i + 1) * threadExecuteFileNum;
-            List<File> fileList = files.subList(startIndex, endIndex);
-
-            new Thread(() -> {
-                for (File file : fileList) {
-                    insertContentToMapFromFile(file);
-                }
-            }).start();
-        }
-
+        insertContentToMapFromFile(files);
         return resultMap;
     }
 
-    private static void insertContentToMapFromFile(File file) {
-        synchronized (LOCK) {
+    private static void insertContentToMapFromFile(List<File> fileList) {
+        for (File file : fileList) {
             try {
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
                 while (true) {
