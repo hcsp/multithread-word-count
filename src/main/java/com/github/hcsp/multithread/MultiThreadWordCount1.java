@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MultiThreadWordCount1 extends Thread {
-    public static final Object lock = new Object();
-    public static final Map<String, Integer> resultMap = new HashMap<>();
+    public static final Object LOCK = new Object();
+    public static Map<String, Integer> resultMap = new HashMap<>();
 
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         int fileLength = files.size();
@@ -32,7 +32,7 @@ public class MultiThreadWordCount1 extends Thread {
     }
 
     private static void insertContentToMapFromFile(File file) {
-        synchronized (lock) {
+        synchronized (LOCK) {
             try {
                 BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
                 while (true) {
