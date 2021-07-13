@@ -1,9 +1,6 @@
 package com.github.hcsp.multithread;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -47,26 +44,7 @@ public class MultiThreadWordCount2 {
 
         @Override
         public Map<String, Integer> call() {
-            try {
-                BufferedReader bufferedReader = new BufferedReader(new FileReader(FILE));
-                while (true) {
-                    String line = bufferedReader.readLine();
-                    if (line == null) {
-                        break;
-                    }
-                    String[] wordList = line.split("\\s+");
-                    for (String word : wordList) {
-                        if (RESULT_MAP.containsKey(word)) {
-                            RESULT_MAP.put(word, RESULT_MAP.get(word) + 1);
-                        } else {
-                            RESULT_MAP.put(word, 1);
-                        }
-                    }
-                }
-                return RESULT_MAP;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            return new ProcessFile(RESULT_MAP, FILE).processFile();
         }
     }
 }
