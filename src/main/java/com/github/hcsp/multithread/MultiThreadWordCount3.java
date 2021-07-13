@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 public class MultiThreadWordCount3 {
+    // TODO: use ConcurrentHashMap
     private static final Object lock = new Object();
     private static final Map<String, Integer> resultMap = new HashMap<>();
 

@@ -18,7 +18,6 @@ public class MultiThreadWordCount2 {
             Future submit = executorService.submit(new Temp(file));
             try {
                 ConcurrentHashMap<String, Integer> result = (ConcurrentHashMap<String, Integer>) submit.get();
-                System.out.println("result = " + result);
                 result.keySet().forEach(key -> {
                     if (resultMap.containsKey(key)) {
                         resultMap.put(key, resultMap.get(key) + result.get(key));
