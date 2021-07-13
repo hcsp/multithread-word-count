@@ -18,6 +18,7 @@ public class MultiThreadWordCount2 {
             Future submit = executorService.submit(new Temp(file));
             try {
                 ConcurrentHashMap<String, Integer> result = (ConcurrentHashMap<String, Integer>) submit.get();
+                System.out.println("result = " + result);
                 result.keySet().forEach(key -> {
                     if (resultMap.containsKey(key)) {
                         resultMap.put(key, resultMap.get(key) + result.get(key));
@@ -34,8 +35,6 @@ public class MultiThreadWordCount2 {
     }
 
     private static class Temp implements Callable {
-
-        private final Map<String, Integer> RESULT_MAP = new ConcurrentHashMap<>();
         private final File FILE;
 
         Temp(File file) {
@@ -44,7 +43,7 @@ public class MultiThreadWordCount2 {
 
         @Override
         public Map<String, Integer> call() {
-            return new ProcessFile(RESULT_MAP, FILE).processFile();
+            return new ProcessFile(FILE).processFile();
         }
     }
 }

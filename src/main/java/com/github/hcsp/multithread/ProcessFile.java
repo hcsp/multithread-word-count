@@ -4,18 +4,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ProcessFile {
-    private Map<String, Integer> resultMap;
-    private File file;
+    private final ConcurrentHashMap<String, Integer> resultMap = new ConcurrentHashMap<>();
+    private final File file;
 
-    public ProcessFile(Map<String, Integer> resultMap, File file) {
-        this.resultMap = resultMap;
+    public ProcessFile(File file) {
         this.file = file;
     }
 
-    public Map<String, Integer> processFile() {
+    public ConcurrentHashMap<String, Integer> processFile() {
         try {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
             while (true) {

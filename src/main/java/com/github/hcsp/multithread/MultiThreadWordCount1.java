@@ -10,13 +10,12 @@ public class MultiThreadWordCount1 {
     public static Map<String, Integer> resultMap = new HashMap<>();
 
     public static Map<String, Integer> count(int threadNum, List<File> files) {
-        for (int i = 0; i < threadNum; ++i) {
-            int finalI = i;
-            new Thread(() -> insertContentToMapFromFile(files.get(finalI), finalI == files.size() - 1)).start();
-        }
-
         synchronized (LOCK) {
             try {
+                for (int i = 0; i < threadNum; ++i) {
+                    int finalI = i;
+                    new Thread(() -> insertContentToMapFromFile(files.get(finalI), finalI == files.size() - 1)).start();
+                }
                 LOCK.wait();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -28,10 +27,18 @@ public class MultiThreadWordCount1 {
 
     private static void insertContentToMapFromFile(File file, boolean isLast) {
         synchronized (LOCK) {
-            new ProcessFile(resultMap, file).processFile();
+            Map<String, Integer> result = new ProcessFile(file).processFile();
+            result.keySet().forEach(key -> {
+                if (resultMap.containsKey(key)) {
+                    resultMap.put(key, resultMap.get(key) + result.get(key));
+                } else {
+                    resultMap.put(key, result.get(key));
+                }
+            });
             if (isLast) {
                 LOCK.notify();
             }
         }
+
     }
 }
