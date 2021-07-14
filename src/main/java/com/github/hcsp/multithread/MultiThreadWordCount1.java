@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MultiThreadWordCount1 {
     public static final Object LOCK = new Object();
@@ -28,8 +27,7 @@ public class MultiThreadWordCount1 {
 
     private static void insertContentToMapFromFile(File file, boolean isLast) {
         synchronized (LOCK) {
-            ConcurrentHashMap<String, Integer> result = new ProcessFile(file).processFile();
-            MergeMap.merge(resultMap, result);
+            ProcessFile.convertWordsInFileToMap(file, resultMap);
             if (isLast) {
                 LOCK.notify();
             }

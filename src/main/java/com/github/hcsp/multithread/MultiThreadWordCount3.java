@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 public class MultiThreadWordCount3 {
@@ -40,8 +39,7 @@ public class MultiThreadWordCount3 {
 
         public void run() {
             synchronized (lock) {
-                ConcurrentHashMap<String, Integer> result = new ProcessFile(file).processFile();
-                MergeMap.merge(resultMap, result);
+                ProcessFile.convertWordsInFileToMap(file, resultMap);
                 doneSignal.countDown();
             }
         }

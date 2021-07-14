@@ -11,14 +11,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class MultiThreadWordCount2 {
+    private static Map<String, Integer> resultMap = new ConcurrentHashMap<>();
+
     public static Map<String, Integer> count(int threadNum, List<File> files) {
-        Map<String, Integer> resultMap = new ConcurrentHashMap<>();
         ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
         for (File file : files) {
             Future submit = executorService.submit(new Temp(file));
             try {
-                ConcurrentHashMap<String, Integer> result = (ConcurrentHashMap<String, Integer>) submit.get();
-                MergeMap.merge(resultMap, result);
+                submit.get();
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
@@ -36,7 +36,7 @@ public class MultiThreadWordCount2 {
 
         @Override
         public Map<String, Integer> call() {
-            return new ProcessFile(FILE).processFile();
+            return ProcessFile.convertWordsInFileToMap(FILE, resultMap);
         }
     }
 }

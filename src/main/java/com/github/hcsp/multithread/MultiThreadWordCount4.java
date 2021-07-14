@@ -31,8 +31,7 @@ public class MultiThreadWordCount4 {
     private static void insertContentToMapFromFile(File file, boolean isLast) {
         lock.lock();
         try {
-            Map<String, Integer> result = new ProcessFile(file).processFile();
-            MergeMap.merge(resultMap, result);
+            ProcessFile.convertWordsInFileToMap(file, resultMap);
             if (isLast) {
                 isModifyingMap.signal();
             }
