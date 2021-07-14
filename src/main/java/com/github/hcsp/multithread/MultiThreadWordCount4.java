@@ -32,13 +32,7 @@ public class MultiThreadWordCount4 {
         lock.lock();
         try {
             Map<String, Integer> result = new ProcessFile(file).processFile();
-            result.keySet().forEach(key -> {
-                if (resultMap.containsKey(key)) {
-                    resultMap.put(key, resultMap.get(key) + result.get(key));
-                } else {
-                    resultMap.put(key, result.get(key));
-                }
-            });
+            MergeMap.merge(resultMap, result);
             if (isLast) {
                 isModifyingMap.signal();
             }

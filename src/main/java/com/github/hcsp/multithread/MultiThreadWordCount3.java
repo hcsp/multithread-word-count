@@ -41,13 +41,7 @@ public class MultiThreadWordCount3 {
         public void run() {
             synchronized (lock) {
                 ConcurrentHashMap<String, Integer> result = new ProcessFile(file).processFile();
-                result.keySet().forEach(key -> {
-                    if (resultMap.get(key) != null) {
-                        resultMap.put(key, resultMap.get(key) + result.get(key));
-                    } else {
-                        resultMap.put(key, result.get(key));
-                    }
-                });
+                MergeMap.merge(resultMap, result);
                 doneSignal.countDown();
             }
         }
