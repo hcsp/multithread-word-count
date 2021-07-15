@@ -1,15 +1,13 @@
 package com.github.hcsp.multithread;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 public class MultiThreadWordCount3 {
-    // TODO: use ConcurrentHashMap
-    private static final Object lock = new Object();
-    private static final Map<String, Integer> resultMap = new HashMap<>();
+    private static final Map<String, Integer> resultMap = new ConcurrentHashMap<>();
 
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         CountDownLatch doneSignal = new CountDownLatch(threadNum);
@@ -38,10 +36,8 @@ public class MultiThreadWordCount3 {
         }
 
         public void run() {
-            synchronized (lock) {
-                ProcessFile.convertWordsInFileToMap(file, resultMap);
-                doneSignal.countDown();
-            }
+            ProcessFile.convertWordsInFileToMap(file, resultMap);
+            doneSignal.countDown();
         }
     }
 }
