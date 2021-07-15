@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 
 public class MultiThreadWordCount5 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
-    private static Map<String, Integer> resultMap = new ConcurrentHashMap<>();
+    private static final Map<String, Integer> resultMap = new ConcurrentHashMap<>();
 
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         ForkJoinPool forkJoinPool = new ForkJoinPool(threadNum);
