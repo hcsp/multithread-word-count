@@ -68,7 +68,9 @@ public class MultiThreadWordCount2 {
             Map<String, Integer> result = new HashMap<>();
             while (true) {
                 try {
-                    if ((line = multiFilesReader.readLine()) == null) break;
+                    if ((line = multiFilesReader.readLine()) == null) {
+                        break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

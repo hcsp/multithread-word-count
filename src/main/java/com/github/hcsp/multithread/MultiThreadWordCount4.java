@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,7 +57,9 @@ public class MultiThreadWordCount4 {
             Map<String, Integer> result = new HashMap<>();
             while (true) {
                 try {
-                    if ((line = multiFilesReader.readLine()) == null) break;
+                    if ((line = multiFilesReader.readLine()) == null) {
+                        break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

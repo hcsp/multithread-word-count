@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.ExecutionException;
 
 public class MultiThreadWordCount5 {
 
@@ -45,7 +44,9 @@ public class MultiThreadWordCount5 {
             Map<String, Integer> wordCount = new HashMap<>();
             while (true) {
                 try {
-                    if ((line = multiFilesReader.readLine()) == null) break;
+                    if ((line = multiFilesReader.readLine()) == null) {
+                        break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
