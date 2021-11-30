@@ -20,11 +20,9 @@ public class MultiThreadWordCount1 {
         List<Future<Map<String, Integer>>> futures = new ArrayList<>();
 
 
-        for (File everyfile: files) {
+        for (File everyfile : files) {
             //读取字符流
             BufferedReader bufferedReader = new BufferedReader(new FileReader(everyfile));
-
-
 
 
             //多线程创建
@@ -39,12 +37,12 @@ public class MultiThreadWordCount1 {
                         Map<String, Integer> everylinemessage = new HashMap<>();
                         //读取每一行
                         String everyline = null;
-                        while ((everyline =bufferedReader.readLine()) != null) {
+                        while ((everyline = bufferedReader.readLine()) != null) {
                             //分割
                             String[] words = everyline.split(" ");
                             //统计并添加到第一个map
-                            for (String word: words) {
-                                everylinemessage.put(word, everylinemessage.getOrDefault(word,0) + 1);
+                            for (String word : words) {
+                                everylinemessage.put(word, everylinemessage.getOrDefault(word, 0) + 1);
                             }
                         }
                         return everylinemessage;
@@ -60,9 +58,9 @@ public class MultiThreadWordCount1 {
         }
         //汇总map列表中的信息， 总结成最终结果
         Map<String, Integer> finalmap = new HashMap<>();
-        for ( Map<String, Integer> everymap: mapcollection) {
-            for (Map.Entry<String, Integer> entry: everymap.entrySet()) {
-                finalmap.put(entry.getKey(),finalmap.getOrDefault(entry.getKey(),0) + entry.getValue());
+        for (Map<String, Integer> everymap : mapcollection) {
+            for (Map.Entry<String, Integer> entry : everymap.entrySet()) {
+                finalmap.put(entry.getKey(), finalmap.getOrDefault(entry.getKey(), 0) + entry.getValue());
             }
 
         }
