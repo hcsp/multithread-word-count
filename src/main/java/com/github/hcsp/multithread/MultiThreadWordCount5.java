@@ -12,7 +12,7 @@ public class MultiThreadWordCount5 {
     // 使用CyclicBarrier
 
     public static Map<String, Integer> count(int threadNum, List<File> files) {
-        CyclicBarrier cyclicBarrier = new CyclicBarrier(threadNum);
+        CyclicBarrier cyclicBarrier = new CyclicBarrier(threadNum + 1);
         List<Map<String, Integer>> mapList = new CopyOnWriteArrayList<>();
         for (File file : files) {
             new Thread(() -> {
@@ -26,6 +26,11 @@ public class MultiThreadWordCount5 {
 
             }).start();
 
+        }
+        try {
+            cyclicBarrier.await();
+        } catch (InterruptedException | BrokenBarrierException e) {
+            e.printStackTrace();
         }
         return CountUtil.mergeFileResult(mapList);
     }
