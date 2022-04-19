@@ -10,7 +10,7 @@ public class MultiThreadWordCount6 {
     // 使用 parallelStream() 实现
     public static Map<String, Integer> count(int threadNum, List<File> files) {
         Map<String, Integer> finalCountResult = new ConcurrentHashMap<>();
-        files.parallelStream().forEach((file) -> CountUtil.mergeSingleCountResultToFinalCountResult(
+        files.parallelStream().forEach(file -> CountUtil.mergeSingleCountResultToFinalCountResult(
                 CountUtil.getCountResultFromSingleFile(file), finalCountResult));
         return finalCountResult;
     }
