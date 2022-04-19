@@ -4,13 +4,11 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class MultiThreadWordCount1 {
     // 使用threadNum个线程，并发统计文件中各单词的数量
     // 使用 Object.wait / notify 实现
-    private static final Lock LOCK = new ReentrantLock();
+    private static final Object LOCK = new Object();
     private static int numOfMergedFiles = 0;
     private static int numOfRunningThread = 0;
 
