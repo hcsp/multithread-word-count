@@ -50,7 +50,7 @@ public class MultiThreadWordCount1 {
     static class WorkerJob implements Callable<Map<String, Integer>> {
         private BufferedReader reader;
 
-        public WorkerJob(BufferedReader reader) {
+        WorkerJob(BufferedReader reader) {
             this.reader = reader;
         }
 
