@@ -27,7 +27,7 @@ public class MultiThreadWordCount1 {
             List<Future<Map<String, Integer>>> futures = new ArrayList<>();
             BufferedReader reader = new BufferedReader(new FileReader(file));
             for (int i = 0; i < threadNum; i++) {
-                futures.add(threadPool.submit(new workerJob(reader)));
+                futures.add(threadPool.submit(new WorkerJob(reader)));
 
             }
             for (Future<Map<String, Integer>> future: futures) {
@@ -47,10 +47,10 @@ public class MultiThreadWordCount1 {
         }
     }
 
-    static class workerJob implements Callable<Map<String, Integer>> {
+    static class WorkerJob implements Callable<Map<String, Integer>> {
         private BufferedReader reader;
 
-        public workerJob(BufferedReader reader) {
+        public WorkerJob(BufferedReader reader) {
             this.reader = reader;
         }
 
