@@ -1,6 +1,10 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,8 +79,6 @@ public class MultiThreadWordCount4 {
 
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-//                lock.unlock();
             }
         }
     }

@@ -1,14 +1,18 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MultiThreadWordCount5 {
 
-    private static final Object obj = new Object();
-
+    public static ReentrantLock lock = new ReentrantLock();
     // 使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) {
 
@@ -18,9 +22,11 @@ public class MultiThreadWordCount5 {
                 .map(MultiThreadWordCount5::readAndCompute)
                 .forEach(map -> {
                     for (String word : map.keySet()) {
+                        lock.lock();
                         Integer cnt = res.getOrDefault(word, 0);
 
                         res.put(word, cnt + map.get(word));
+                        lock.unlock();
                     }
                 });
 

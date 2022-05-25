@@ -1,6 +1,10 @@
 package com.github.hcsp.multithread;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MultiThreadWordCount3 {
 
-    public static final Object obj = new Object();
+    public static final Object OBJECT = new Object();
 
     //     使用threadNum个线程，并发统计文件中各单词的数量
     public static Map<String, Integer> count(int threadNum, List<File> files) {
@@ -63,14 +67,13 @@ public class MultiThreadWordCount3 {
                     String[] words = line.split("\\s+");
 
                     for (String word : words) {
-                        synchronized (obj) {
+                        synchronized (OBJECT) {
                             Integer cnt = map.getOrDefault(word, 0);
 
                             map.put(word, cnt + 1);
                         }
                     }
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
