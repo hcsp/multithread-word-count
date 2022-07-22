@@ -16,8 +16,8 @@ public class MultiThreadWordCount5 {
          * 协同: Semaphore
          */
         int step = files.size() / threadNum;
-        Semaphore emptySlot = new Semaphore(threadNum);
-        Semaphore fullSlot = new Semaphore(0);
+        Semaphore emptySlot = new Semaphore(0);
+        Semaphore fullSlot = new Semaphore(threadNum);
 
         for (int i = 0; i < threadNum; i++) {
             new WordCounter5(result, files.subList(i * step, i == threadNum - 1 ? files.size() : (i + 1) * step), emptySlot, fullSlot).start();
