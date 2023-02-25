@@ -36,7 +36,7 @@ public class MultiThreadWordCount1 {
         }
     }
 
-    static private void mergeResult(Map<String, Integer> singleResult) {
+    private static void mergeResult(Map<String, Integer> singleResult) {
         for (Map.Entry<String, Integer> entry : singleResult.entrySet()) {
             finalResult.put(entry.getKey(), finalResult.getOrDefault(entry.getKey(), 0) + entry.getValue());
         }
