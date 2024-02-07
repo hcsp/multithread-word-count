@@ -37,7 +37,7 @@ public class MultiThreadWordCount3 {
     private static class ReadAndCount implements Runnable {
         private final List<File> inputFiles;
 
-        public ReadAndCount(List<File> inputFiles) {
+        ReadAndCount(List<File> inputFiles) {
             this.inputFiles = inputFiles;
         }
 

@@ -27,7 +27,7 @@ public class MultiThreadWordCount5 {
         private final int start;
         private final int end;
 
-        public ReadAndCount(List<File> files, int chunkNum, int start, int end) {
+        ReadAndCount(List<File> files, int chunkNum, int start, int end) {
             this.files = files;
             this.chunkNum = chunkNum;
             this.start = start;

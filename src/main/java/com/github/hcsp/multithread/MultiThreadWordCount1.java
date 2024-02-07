@@ -37,7 +37,7 @@ public class MultiThreadWordCount1 {
         private final List<File> inputFiles;
         private final int threadNum;
 
-        public ReadAndCount(List<File> inputFiles, int threadNum) {
+        ReadAndCount(List<File> inputFiles, int threadNum) {
             this.inputFiles = inputFiles;
             this.threadNum = threadNum;
         }
@@ -59,14 +59,15 @@ public class MultiThreadWordCount1 {
             //修改完成后,应该开始累积完成的线程数量,当所有线程都完成时,就唤醒main线程.
             //多线程的情况下,如果以"最后"一个线程作为完成标志会有问题,除非让每个线程都完成自己的工作所有后再释放锁
             finishedTheardNum.addAndGet(1);
-            synchronized (result){
-                if (finishedTheardNum.get() == threadNum)
+            synchronized (result) {
+                if (finishedTheardNum.get() == threadNum) {
                     result.notify();
+                }
             }
         }
 
         private void mergeWordsIntoResult(String[] words) {
-            synchronized (result){
+            synchronized (result) {
                 for (String word :
                         words) {
                     result.put(word, result.getOrDefault(word, 0) + 1);
